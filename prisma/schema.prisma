@@ -1,0 +1,421 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  password   String
+  first_name String
+  last_name  String?
+  avatar_url String?
+  is_active  Boolean    @default(true)
+  created_at DateTime   @default(now()) @db.Timestamptz(3)
+  updated_at DateTime?  @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime?  @db.Timestamptz(3)
+  forms      Form[]
+  event_logs EventLog[]
+
+  @@map("users")
+}
+
+model Form {
+  id                   Int                      @id @default(autoincrement())
+  title                String
+  icon_url             String?
+  description          String?
+  creator              User                     @relation(fields: [user_id], references: [id])
+  user_id              Int
+  quiz_setting         QuizSetting?
+  response_setting     FormResponseSetting?
+  presentation_setting FormPresentationSetting?
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  choice_questions      ChoiceQuestion[]
+  file_upload_questions FileUploadQuestion[]
+  date_questions        DateQuestion[]
+  nps_questions         NpsQuestion[]
+  rating_questions      RatingQuestion[]
+  info_questions        InfoQuestion[]
+  texts                 Text[]
+  text_questions        TextQuestion[]
+  responses             Response[]
+
+  @@map("forms")
+}
+
+model QuizSetting {
+  id      Int  @id @default(autoincrement())
+  form    Form @relation(fields: [form_id], references: [id])
+  form_id Int  @unique
+
+  is_quiz                   Boolean @default(false)
+  default_point_value       Int     @default(0)
+  release_score_immediately Boolean @default(false)
+  view_missed_questions     Boolean @default(true)
+  view_correct_answers      Boolean @default(true)
+  view_point_values         Boolean @default(true)
+
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("quiz_settings")
+}
+
+model FormResponseSetting {
+  id      Int  @id @default(autoincrement())
+  form    Form @relation(fields: [form_id], references: [id])
+  form_id Int  @unique
+
+  all_questions_required Boolean @default(true)
+  single_response        Boolean @default(true)
+
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("form_response_settings")
+}
+
+model FormPresentationSetting {
+  id      Int  @id @default(autoincrement())
+  form    Form @relation(fields: [form_id], references: [id])
+  form_id Int  @unique
+
+  show_progress_bar Boolean @default(false)
+  shuffle_question  Boolean @default(false)
+
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("form_presentation_settings")
+}
+
+enum choice_type {
+  RADIO
+  CHECKBOX
+  DROP_DOWN
+}
+
+enum file_type {
+  ANY
+  DOCUMENT
+  PRESENTATION
+  SPREADSHEET
+  PDF
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+enum rating_type {
+  STAR
+  HEART
+}
+
+enum info_type {
+  WEBSITE
+  PHONE
+  EMAIL
+}
+
+enum question_type {
+  CHOICE
+  FILE_UPLOAD
+  DATE
+  NPS
+  RATING
+  INFO
+  TEXT
+}
+
+enum feedback_parent_type {
+  GRADING
+  RESPONSE
+}
+
+enum feedback_sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+model Feedback {
+  id          Int                  @id @default(autoincrement())
+  parent_id   Int
+  parent_type feedback_parent_type
+  content     String
+  sentiment   feedback_sentiment
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("feedbacks")
+}
+
+model ChoiceQuestion {
+  id Int @id @default(autoincrement())
+
+  content         String
+  type            choice_type
+  shuffle_options Boolean     @default(false)
+  position        Int
+  form            Form        @relation(fields: [form_id], references: [id])
+  form_id         Int
+  created_at      DateTime    @default(now()) @db.Timestamptz(3)
+  updated_at      DateTime?   @updatedAt @db.Timestamptz(3)
+  deleted_at      DateTime?   @db.Timestamptz(3)
+
+  @@map("choice_questions")
+}
+
+model FileUploadQuestion {
+  id Int @id @default(autoincrement())
+
+  content       String
+  max_file_size Int
+  max_files     Int
+  types         file_type[]
+  position      Int
+  form          Form        @relation(fields: [form_id], references: [id])
+  form_id       Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("file_upload_questions")
+}
+
+model DateQuestion {
+  id Int @id @default(autoincrement())
+
+  content      String
+  include_year Boolean @default(true)
+  include_time Boolean @default(true)
+  position     Int
+  form         Form    @relation(fields: [form_id], references: [id])
+  form_id      Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("date_questions")
+}
+
+model NpsQuestion {
+  id Int @id @default(autoincrement())
+
+  content    String
+  high       Int
+  low        Int
+  low_label  String
+  high_label String
+  position   Int
+  form       Form   @relation(fields: [form_id], references: [id])
+  form_id    Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("nps_questions")
+}
+
+model RatingQuestion {
+  id Int @id @default(autoincrement())
+
+  content    String
+  type       rating_type
+  high       Int
+  low        Int
+  low_label  String
+  high_label String
+  position   Int
+  form       Form        @relation(fields: [form_id], references: [id])
+  form_id    Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("rating_questions")
+}
+
+model InfoQuestion {
+  id Int @id @default(autoincrement())
+
+  content  String
+  type     info_type
+  position Int
+  form     Form      @relation(fields: [form_id], references: [id])
+  form_id  Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("info_questions")
+}
+
+model TextQuestion {
+  id Int @id @default(autoincrement())
+
+  content   String
+  paragraph Boolean @default(false)
+  position  Int
+  form      Form    @relation(fields: [form_id], references: [id])
+  form_id   Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("text_questions")
+}
+
+model Text {
+  id Int @id @default(autoincrement())
+
+  content  String
+  position Int
+  form     Form   @relation(fields: [form_id], references: [id])
+  form_id  Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("texts")
+}
+
+model Option {
+  id                       Int                     @id @default(autoincrement())
+  question_id              Int
+  content                  String
+  image_url                String?
+  position                 Int
+  question_type            question_type
+  grading_correct_optionId GradingCorrectOptionId?
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@unique([id, question_id])
+  @@map("options")
+}
+
+model Grading {
+  id                  Int           @id @default(autoincrement())
+  question_id         String
+  question_type       question_type
+  point_value         Int
+  feedback_when_right Int?
+  feedback_when_wrong Int?
+
+  correct_option_ids GradingCorrectOptionId[]
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@unique([id, question_id])
+  @@map("gradings")
+}
+
+model GradingCorrectOptionId {
+  grading    Grading @relation(fields: [grading_id], references: [id])
+  grading_id Int
+  option     Option  @relation(fields: [option_id], references: [id])
+  option_id  Int     @unique
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("grading_correct_option_ids")
+}
+
+model Response {
+  id               Int      @id @default(autoincrement())
+  form             Form     @relation(fields: [form_id], references: [id])
+  form_id          Int
+  respondent_email String
+  total_score      Int
+  answers          Answer[]
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("responses")
+}
+
+model Answer {
+  id            Int           @id @default(autoincrement())
+  question_id   Int
+  question_type question_type
+  response      Response      @relation(fields: [response_id], references: [id])
+  response_id   Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  textAnswers       TextAnswer[]
+  fileUploadAnswers FileUploadAnswer[]
+
+  @@map("answers")
+}
+
+model TextAnswer {
+  id        Int    @id @default(autoincrement())
+  value     String
+  answer    Answer @relation(fields: [answer_id], references: [id])
+  answer_id Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("text_answers")
+}
+
+model FileUploadAnswer {
+  id                 Int    @id @default(autoincrement())
+  original_file_name String
+  uploadUrl          String
+  answer             Answer @relation(fields: [answer_id], references: [id])
+  answer_id          Int
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("file_upload_answers")
+}
+
+model EventType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime? @updatedAt @db.Timestamptz(3)
+
+  @@map("event_types")
+}
+
+model EventLog {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int
+  object_id   Int?
+  context     Json?
+  occurred_at DateTime @db.Timestamptz(3)
+
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+
+  @@map("event_logs")
+}
