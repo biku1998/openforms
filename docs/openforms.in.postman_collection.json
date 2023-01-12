@@ -1,0 +1,1238 @@
+{
+	"info": {
+		"_postman_id": "a49d8b91-dac2-404b-abc7-505ce6cc5e86",
+		"name": "openforms.in",
+		"description": "# Openforms.in\n\n---\n\n### Rest API docs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13741737"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "local - register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"biku@gmail.com\",\n    \"password\":\"sssh_its_a_secret\",\n    \"firstName\":\"Biku\",\n    \"lastName\":\"Kumar\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/auth/local/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"local",
+								"register"
+							]
+						},
+						"description": "# Register new user"
+					},
+					"response": []
+				},
+				{
+					"name": "local - login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"biku@gmail.com\",\n    \"password\":\"sssh_its_a_secret\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/auth/local/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"local",
+								"login"
+							]
+						},
+						"description": "# Login user"
+					},
+					"response": []
+				},
+				{
+					"name": "local - logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/auth/local/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"local",
+								"logout"
+							]
+						},
+						"description": "# Login user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/users/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"users",
+								"me"
+							]
+						},
+						"description": "# Get user profile info"
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						},
+						"description": "# Update user profile"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "forms",
+			"item": [
+				{
+					"name": "get all forms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new form",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update a form",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "archive a form",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/archive",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"archive"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create form setting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/settings?type=quiz",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"settings"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "quiz"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update form setting",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"settings",
+								":id"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "quiz"
+								}
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get form setting",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"settings",
+								":id"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "quiz"
+								}
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete form setting",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"settings",
+								":id"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "quiz"
+								}
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "questions, options, gradings",
+			"item": [
+				{
+					"name": "get form questions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"questions"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create form question",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"questions"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update form question",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"questions"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "archive form question",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete form question",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create choice question option",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/options",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id",
+								"options"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update choice question option",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/options/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":question_id",
+								"options",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "question_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get choice question options",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/options",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id",
+								"options"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create question grading",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/gradings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id",
+								"gradings"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get question grading",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/gradings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":id",
+								"gradings"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update question grading",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/gradings/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":question_id",
+								"gradings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "question_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete question grading",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/gradings/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"questions",
+								":question_id",
+								"gradings",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "question_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "responses, answers, grades",
+			"item": [
+				{
+					"name": "get form responses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/responses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"responses"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create form response",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/responses",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"responses"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update form response",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete form response",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create response answer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:id/answers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":id",
+								"answers"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update response answer",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete response answer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get response answers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create answer grade",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers/:id/grades",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers",
+								":id",
+								"grades"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get answer grade",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers/:answer_id/grades/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers",
+								":answer_id",
+								"grades",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								},
+								{
+									"key": "answer_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update answer grade",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:form_id/responses/:response_id/answers/:answer_id/grades/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":form_id",
+								"responses",
+								":response_id",
+								"answers",
+								":answer_id",
+								"grades",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "form_id",
+									"value": null
+								},
+								{
+									"key": "response_id",
+									"value": null
+								},
+								{
+									"key": "answer_id",
+									"value": null
+								},
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/_health",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"_health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

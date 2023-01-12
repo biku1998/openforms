@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Form } from 'shared-ts';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFormDto } from './dtos/create-form.dto';
+import { Form } from './types/form';
 
 @Injectable()
 export class FormsService {
