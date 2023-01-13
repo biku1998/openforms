@@ -2,12 +2,12 @@
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:16-slim As development
+FROM node:16 As development
 # TODO : remove the below commands later
 # RUN apk update && apk add openssl1.1-compat
 # RUN apk add --update --no-cache openssl1.1-compat
-RUN apt-get update
-RUN apt-get install -y openssl
+# RUN apt-get update
+# RUN apt-get install -y openssl
 
 
 # Create app directory
@@ -34,12 +34,12 @@ USER node
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:16-slim As build
+FROM node:16 As build
 # TODO : remove the below commands later
 # RUN apk update && apk add openssl1.1-compat
 # RUN apk add --update --no-cache openssl1.1-compat
-RUN apt-get update
-RUN apt-get install -y openssl
+# RUN apt-get update
+# RUN apt-get install -y openssl
 
 WORKDIR /usr/src/app
 
@@ -65,12 +65,12 @@ USER node
 # PRODUCTION
 ###################
 
-FROM node:16-slim As production
+FROM node:16 As production
 # TODO : remove the below commands later
 # RUN apk update && apk add openssl1.1-compat
 # RUN apk add --update --no-cache openssl1.1-compat
-RUN apt-get update
-RUN apt-get install -y openssl
+# RUN apt-get update
+# RUN apt-get install -y openssl
 
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules

@@ -15,7 +15,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Public()
-  @Get('health')
+  @Get('_health')
   @HttpCode(HttpStatus.OK)
   async getHealth() {
     return await this.appService.getHealth();

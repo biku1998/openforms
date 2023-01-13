@@ -24,6 +24,7 @@ import { LoginUserDto } from './dtos/login-user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('local/register')
   async register(

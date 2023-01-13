@@ -8,6 +8,7 @@ export class AppService {
       health: {
         app: 'ok',
         database: 'ok',
+        message: 'hello world',
       },
     };
   }
