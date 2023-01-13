@@ -2,7 +2,13 @@
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:16-alpine As development
+FROM node:16-slim As development
+# TODO : remove the below commands later
+# RUN apk update && apk add openssl1.1-compat
+# RUN apk add --update --no-cache openssl1.1-compat
+RUN apt-get update
+RUN apt-get install -y openssl
+
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -13,10 +19,13 @@ WORKDIR /usr/src/app
 COPY --chown=node:node package*.json ./
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm i
+RUN npm ci
 
 # Bundle app source
 COPY --chown=node:node . .
+
+# Generate Prisma database client code
+RUN npm run prisma:generate
 
 # Use the node user from the image (instead of the root user)
 USER node
@@ -25,7 +34,12 @@ USER node
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:16-alpine As build
+FROM node:16-slim As build
+# TODO : remove the below commands later
+# RUN apk update && apk add openssl1.1-compat
+# RUN apk add --update --no-cache openssl1.1-compat
+RUN apt-get update
+RUN apt-get install -y openssl
 
 WORKDIR /usr/src/app
 
@@ -51,7 +65,12 @@ USER node
 # PRODUCTION
 ###################
 
-FROM node:16-alpine As production
+FROM node:16-slim As production
+# TODO : remove the below commands later
+# RUN apk update && apk add openssl1.1-compat
+# RUN apk add --update --no-cache openssl1.1-compat
+RUN apt-get update
+RUN apt-get install -y openssl
 
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
