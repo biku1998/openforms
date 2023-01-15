@@ -1,4 +1,9 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  INestApplication,
+  Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -10,10 +15,17 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         await this.$connect();
         break;
       } catch (error) {
+        console.log(
+          `❌ Database connection request failed | retries left (${retries}/5)`,
+        );
+        console.log('retrying in 5 seconds...');
         retries -= 1;
-        console.log('failed to connect to database');
-        console.log(`${retries}/5 retries left`);
+        await new Promise((res) => setTimeout(res, 5000));
       }
+    }
+
+    if (retries === 0) {
+      process.kill(process.pid, 'SIGKILL');
     }
   }
 
