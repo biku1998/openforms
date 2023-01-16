@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Form } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFormDto } from './dtos/create-form.dto';
-import { Form } from './types/form';
 
 @Injectable()
 export class FormsService {
@@ -17,7 +17,7 @@ export class FormsService {
     const newForm = await this.prismaService.form.create({
       data: {
         ...createFormDto,
-        user_id: loggedInUserId,
+        created_by_id: loggedInUserId,
       },
     });
     return newForm;
