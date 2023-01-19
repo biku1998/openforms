@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateFormDto {
   @IsNotEmpty()
@@ -7,9 +7,9 @@ export class CreateFormDto {
 
   @IsOptional()
   @IsString()
-  readonly description: string;
+  readonly description?: string;
 
   @IsOptional()
-  @IsString()
-  readonly iconUrl: string;
+  @IsNumber()
+  readonly header_img_file_upload_id?: number;
 }

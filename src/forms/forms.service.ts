@@ -1,25 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { Form } from '@prisma/client';
+import { Form, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateFormDto } from './dtos/create-form.dto';
 
 @Injectable()
 export class FormsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createForm({
-    loggedInUserId,
-    createFormDto,
-  }: {
-    createFormDto: CreateFormDto;
-    loggedInUserId: number;
-  }): Promise<Form> {
+  async createForm({ data }: { data: Prisma.FormCreateInput }): Promise<Form> {
     const newForm = await this.prismaService.form.create({
-      data: {
-        ...createFormDto,
-        created_by_id: loggedInUserId,
-      },
+      data,
     });
     return newForm;
+  }
+
+  async getForms(
+    params: {
+      where?: Prisma.FormWhereInput;
+      orderBy?: Prisma.FormOrderByWithRelationInput[];
+    } = {},
+  ): Promise<Form[]> {
+    const { where, orderBy } = params;
+    const forms = await this.prismaService.form.findMany({
+      where,
+      orderBy,
+    });
+
+    return forms;
+  }
+
+  async updateForm(params: {
+    where: Prisma.FormWhereUniqueInput;
+    data: Prisma.FormUpdateInput;
+  }): Promise<Form> {
+    const { where, data } = params;
+    const updatedForm = await this.prismaService.form.update({
+      where,
+      data,
+    });
+    return updatedForm;
   }
 }

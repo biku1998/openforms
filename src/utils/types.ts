@@ -11,3 +11,8 @@ export type UserSession = Session &
       lastLogin: string;
     }
   >;
+
+export enum ItemState {
+  archived = 'archived',
+  active = 'active',
+}

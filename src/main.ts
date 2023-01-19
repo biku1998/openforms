@@ -1,6 +1,7 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as session from 'express-session';
 import * as connectRedis from 'connect-redis'; // new code
 import IoRedis from 'ioredis';
@@ -15,10 +16,15 @@ async function bootstrap() {
   });
 
   // enable global request validation
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+  );
 
   // enable helmet
   app.use(helmet());
+
+  // enable cors
+  app.enableCors();
 
   // some prisma relate stuff
   const prismaService: PrismaService = app.get(PrismaService);
@@ -53,6 +59,16 @@ async function bootstrap() {
   // add global guards
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new SessionGuard(reflector));
+
+  // swagger setup
+  const config = new DocumentBuilder()
+    .setTitle('openforms.in backend api')
+    .setDescription('Restful API for openforms.in')
+    .setVersion('1.0')
+    .addTag('openforms')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(configService.get<number>('PORT'));
 }

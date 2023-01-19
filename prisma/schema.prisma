@@ -138,6 +138,7 @@ model Form {
   description               String?
   is_active                 Boolean   @default(true)
   created_by_id             Int
+  is_published              Boolean   @default(false)
   last_updated_by_id        Int?
   created_at                DateTime  @default(now()) @db.Timestamptz(3)
   last_updated_at           DateTime? @updatedAt @db.Timestamptz(3)
@@ -151,6 +152,7 @@ model Form {
   response_setting     FormResponseSetting?
   presentation_setting FormPresentationSetting?
 
+  @@unique([id, created_by_id])
   @@map("forms")
 }
 
