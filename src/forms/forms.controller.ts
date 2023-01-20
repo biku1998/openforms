@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   InternalServerErrorException,
   NotFoundException,
@@ -148,6 +149,129 @@ export class FormsController {
 
       return form;
     } catch (error) {
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Delete(':id/archive')
+  async archiveForm(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      await this.formService.archiveForm({
+        where: {
+          id_created_by_id: {
+            id,
+            created_by_id: session.user.userId,
+          },
+        },
+        data: {
+          last_updated_by_user: {
+            connect: {
+              id: session.user.userId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Patch(':id/publish')
+  async publishForm(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      await this.formService.publishForm({
+        where: {
+          id_created_by_id: {
+            id,
+            created_by_id: session.user.userId,
+          },
+        },
+        data: {
+          last_updated_by_user: {
+            connect: {
+              id: session.user.userId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Delete(':id/publish')
+  async unPublishForm(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      await this.formService.unPublishForm({
+        where: {
+          id_created_by_id: {
+            id,
+            created_by_id: session.user.userId,
+          },
+        },
+        data: {
+          last_updated_by_user: {
+            connect: {
+              id: session.user.userId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
       throw new InternalServerErrorException(
         'Oops! Something went really wrong',
       );

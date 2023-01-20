@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class UpdateFormDto {
   @IsOptional()
@@ -12,8 +12,4 @@ export class UpdateFormDto {
   @IsOptional()
   @IsNumber()
   readonly header_img_file_upload_id?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  readonly is_active?: boolean;
 }

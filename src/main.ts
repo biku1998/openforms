@@ -12,7 +12,7 @@ import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['verbose'],
+    logger: ['log', 'debug', 'error', 'verbose', 'warn'],
   });
 
   // enable global request validation

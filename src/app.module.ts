@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { HealthModule } from './health/health.module';
 import { HttpModule } from '@nestjs/axios';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -33,6 +34,10 @@ import { HttpModule } from '@nestjs/axios';
         };
       },
       inject: [ConfigService],
+    }),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+      delimiter: '.',
     }),
     AuthModule,
     UsersModule,

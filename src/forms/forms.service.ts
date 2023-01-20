@@ -13,6 +13,55 @@ export class FormsService {
     return newForm;
   }
 
+  async archiveForm(params: {
+    where: Prisma.FormWhereUniqueInput;
+    data: Prisma.FormUpdateInput;
+  }): Promise<Form> {
+    const { where, data } = params;
+    const deletedForm = await this.prismaService.form.update({
+      where,
+      data: {
+        ...data,
+        is_active: false,
+      },
+    });
+
+    return deletedForm;
+  }
+
+  async publishForm(params: {
+    where: Prisma.FormWhereUniqueInput;
+    data: Prisma.FormUpdateInput;
+  }): Promise<Form> {
+    const { where, data } = params;
+    const publishedForm = await this.prismaService.form.update({
+      where,
+      data: {
+        ...data,
+        is_published: true,
+      },
+    });
+
+    return publishedForm;
+  }
+
+  async unPublishForm(params: {
+    where: Prisma.FormWhereUniqueInput;
+    data: Prisma.FormUpdateInput;
+  }): Promise<Form> {
+    const { where, data } = params;
+    console.log({ data });
+    const publishedForm = await this.prismaService.form.update({
+      where,
+      data: {
+        ...data,
+        is_published: false,
+      },
+    });
+
+    return publishedForm;
+  }
+
   async getForms(
     params: {
       where?: Prisma.FormWhereInput;

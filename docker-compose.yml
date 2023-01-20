@@ -1,5 +1,6 @@
 services:
   database:
+    container_name: postgres
     image: postgres:15
     restart: always
     environment:
@@ -28,6 +29,8 @@ services:
       - '8081:8081'
 
   backend:
+    container_name: openforms-backend-api
+    image: biku1998/openforms-backend-api
     build:
       dockerfile: Dockerfile
       context: .
