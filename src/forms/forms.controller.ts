@@ -277,4 +277,45 @@ export class FormsController {
       );
     }
   }
+
+  @Patch(':id/restore')
+  async restoreForm(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      await this.formService.restoreForm({
+        where: {
+          id_created_by_id: {
+            id,
+            created_by_id: session.user.userId,
+          },
+        },
+        data: {
+          last_updated_by_user: {
+            connect: {
+              id: session.user.userId,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
 }

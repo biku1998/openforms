@@ -15,6 +15,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     let retries = 5;
+    const retryDelayInSeconds = 2;
+
     while (retries > 0) {
       try {
         await this.$connect();
@@ -23,9 +25,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         console.log(
           `❌ Database connection request failed | retries left (${retries}/5)`,
         );
-        console.log('retrying in 5 seconds...');
+        console.log(`retrying in ${retryDelayInSeconds} seconds...`);
         retries -= 1;
-        await new Promise((res) => setTimeout(res, 5000));
+        await new Promise((res) => setTimeout(res, retryDelayInSeconds * 1000));
       }
     }
 

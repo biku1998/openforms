@@ -2,8 +2,8 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as session from 'express-session';
-import * as connectRedis from 'connect-redis'; // new code
+import session from 'express-session';
+import connectRedis from 'connect-redis'; // new code
 import IoRedis from 'ioredis';
 import helmet from 'helmet';
 import { AppModule } from './app.module';

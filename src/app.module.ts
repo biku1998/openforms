@@ -10,6 +10,7 @@ import { FormsModule } from './forms/forms.module';
 import { HealthModule } from './health/health.module';
 import { HttpModule } from '@nestjs/axios';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     FormsModule,
     HealthModule,
     HttpModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
