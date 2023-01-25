@@ -17,7 +17,7 @@ export class UsersController {
   @Get('me')
   async me(@GetSession() session: UserSession) {
     if (!session.user) throw new UnauthorizedException();
-    const userEmail = session.user.userEmail;
+    const userEmail = session.user.email;
     const user = await this.userService.findByEmail(userEmail);
 
     const { password: _, ...safeUser } = user;

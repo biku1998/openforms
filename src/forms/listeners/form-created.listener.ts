@@ -18,6 +18,11 @@ export class FormCreatedListener {
             id,
           },
         },
+        createdByUser: {
+          connect: {
+            id: event.getUserId(),
+          },
+        },
       },
     });
 
@@ -26,6 +31,11 @@ export class FormCreatedListener {
         form: {
           connect: {
             id,
+          },
+        },
+        createdByUser: {
+          connect: {
+            id: event.getUserId(),
           },
         },
       },

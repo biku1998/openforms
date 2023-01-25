@@ -17,7 +17,7 @@ export class GlobalEventListenerService {
             id: event.getUserId(),
           },
         },
-        event_type: {
+        eventType: {
           connect: {
             name: event.getEventType(),
           },

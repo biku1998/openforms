@@ -4,3 +4,8 @@ export * from './form-published.event';
 export * from './form-restored.event';
 export * from './form-unpublished.event';
 export * from './form-updated.event';
+export * from './form-presentation-setting-updated.event';
+export * from './form-quiz-setting-created.event';
+export * from './form-quiz-setting-updated.event';
+export * from './form-quiz-setting-deleted.event';
+export * from './form-response-setting-updated.event';

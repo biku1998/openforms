@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { FormsService } from './forms.service';
-import { FormsController } from './forms.controller';
+import { FormsController, FormsSettingsController } from './controllers';
 import { FormCreatedListener } from './listeners/form-created.listener';
+import { FormsService, FormsSettingsService } from './services';
 
 @Module({
-  providers: [FormsService, FormCreatedListener],
-  controllers: [FormsController],
+  providers: [FormsService, FormsSettingsService, FormCreatedListener],
+  controllers: [FormsController, FormsSettingsController],
 })
 export class FormsModule {}

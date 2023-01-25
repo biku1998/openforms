@@ -10,7 +10,7 @@ import {
   FormRestoredEvent,
   FormUnPublishedEvent,
   FormUpdatedEvent,
-} from './events';
+} from '../events';
 
 @Injectable()
 export class FormsService {
@@ -20,7 +20,7 @@ export class FormsService {
   ) {}
 
   async createForm({ data }: { data: Prisma.FormCreateInput }): Promise<Form> {
-    const newForm = await this.prismaService.form.create({
+    const form = await this.prismaService.form.create({
       data,
     });
 
@@ -28,23 +28,27 @@ export class FormsService {
     this.eventEmitter.emit(
       AppEventType.FORM_CREATED,
       new FormCreatedEvent({
-        form: newForm,
-        userId: newForm.created_by_id,
+        form: form,
+        userId: form.createdById,
       }),
     );
-    return newForm;
+    return form;
   }
 
   async archiveForm(params: {
     where: Prisma.FormWhereUniqueInput;
-    data: Prisma.FormUpdateInput;
+    userId: number;
   }): Promise<Form> {
-    const { where, data } = params;
-    const deletedForm = await this.prismaService.form.update({
+    const { where, userId } = params;
+    const form = await this.prismaService.form.update({
       where,
       data: {
-        ...data,
-        is_active: false,
+        isActive: false,
+        lastUpdatedByUser: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
 
@@ -52,24 +56,28 @@ export class FormsService {
     this.eventEmitter.emit(
       AppEventType.FORM_ARCHIVED,
       new FormArchivedEvent({
-        id: where.id_created_by_id.id,
-        userId: where.id_created_by_id.created_by_id,
+        id: where.id,
+        userId,
       }),
     );
 
-    return deletedForm;
+    return form;
   }
 
   async publishForm(params: {
     where: Prisma.FormWhereUniqueInput;
-    data: Prisma.FormUpdateInput;
+    userId: number;
   }): Promise<Form> {
-    const { where, data } = params;
-    const publishedForm = await this.prismaService.form.update({
+    const { where, userId } = params;
+    const form = await this.prismaService.form.update({
       where,
       data: {
-        ...data,
-        is_published: true,
+        isPublished: true,
+        lastUpdatedByUser: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
 
@@ -77,25 +85,28 @@ export class FormsService {
     this.eventEmitter.emit(
       AppEventType.FORM_PUBLISHED,
       new FormPublishedEvent({
-        id: where.id_created_by_id.id,
-        userId: where.id_created_by_id.created_by_id,
+        id: where.id,
+        userId,
       }),
     );
 
-    return publishedForm;
+    return form;
   }
 
   async unPublishForm(params: {
     where: Prisma.FormWhereUniqueInput;
-    data: Prisma.FormUpdateInput;
+    userId: number;
   }): Promise<Form> {
-    const { where, data } = params;
-    console.log({ data });
-    const publishedForm = await this.prismaService.form.update({
+    const { where, userId } = params;
+    const form = await this.prismaService.form.update({
       where,
       data: {
-        ...data,
-        is_published: false,
+        isPublished: false,
+        lastUpdatedByUser: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
 
@@ -103,12 +114,12 @@ export class FormsService {
     this.eventEmitter.emit(
       AppEventType.FORM_UNPUBLISHED,
       new FormUnPublishedEvent({
-        id: where.id_created_by_id.id,
-        userId: where.id_created_by_id.created_by_id,
+        id: where.id,
+        userId,
       }),
     );
 
-    return publishedForm;
+    return form;
   }
 
   async getForms(
@@ -131,7 +142,7 @@ export class FormsService {
     data: Prisma.FormUpdateInput;
   }): Promise<Form> {
     const { where, data } = params;
-    const updatedForm = await this.prismaService.form.update({
+    const form = await this.prismaService.form.update({
       where,
       data,
     });
@@ -141,23 +152,27 @@ export class FormsService {
       AppEventType.FORM_UPDATED,
       new FormUpdatedEvent({
         payload: data,
-        id: where.id_created_by_id.id,
-        userId: where.id_created_by_id.created_by_id,
+        id: where.id,
+        userId: data.lastUpdatedByUser.connect.id,
       }),
     );
-    return updatedForm;
+    return form;
   }
 
   async restoreForm(params: {
-    data: Prisma.FormUpdateInput;
     where: Prisma.FormWhereUniqueInput;
+    userId: number;
   }): Promise<Form> {
-    const { where, data } = params;
-    const updatedForm = await this.prismaService.form.update({
+    const { where, userId } = params;
+    const form = await this.prismaService.form.update({
       where,
       data: {
-        ...data,
-        is_active: true,
+        isActive: true,
+        lastUpdatedByUser: {
+          connect: {
+            id: userId,
+          },
+        },
       },
     });
 
@@ -165,10 +180,10 @@ export class FormsService {
     this.eventEmitter.emit(
       AppEventType.FORM_RESTORED,
       new FormRestoredEvent({
-        id: where.id_created_by_id.id,
-        userId: where.id_created_by_id.created_by_id,
+        id: where.id,
+        userId,
       }),
     );
-    return updatedForm;
+    return form;
   }
 }

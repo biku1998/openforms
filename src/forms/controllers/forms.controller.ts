@@ -16,9 +16,8 @@ import {
 } from '@nestjs/common';
 import { Form as FormModel, Prisma } from '@prisma/client';
 import { ItemState, UserSession } from 'src/utils/types';
-import { CreateFormDto } from './dtos/create-form.dto';
-import { UpdateFormDto } from './dtos/update-form.dto';
-import { FormsService } from './forms.service';
+import { CreateFormDto, UpdateFormDto } from '../dtos';
+import { FormsService } from '../services';
 
 @Controller({
   version: '1',
@@ -68,8 +67,8 @@ export class FormsController {
 
       const forms = await this.formService.getForms({
         where: {
-          created_by_id: session.user.userId,
-          is_active: state === 'active',
+          createdById: session.user.id,
+          isActive: state === 'active',
           ...or,
         },
         orderBy,
@@ -102,16 +101,13 @@ export class FormsController {
     try {
       const updatedForm = await this.formService.updateForm({
         where: {
-          id_created_by_id: {
-            id,
-            created_by_id: session.user.userId,
-          },
+          id,
         },
         data: {
           ...updateFormDto,
-          last_updated_by_user: {
+          lastUpdatedByUser: {
             connect: {
-              id: session.user.userId,
+              id: session.user.id,
             },
           },
         },
@@ -139,9 +135,9 @@ export class FormsController {
       const form = await this.formService.createForm({
         data: {
           ...createFormDto,
-          created_by_user: {
+          createdByUser: {
             connect: {
-              id: session.user.userId,
+              id: session.user.id,
             },
           },
         },
@@ -171,18 +167,9 @@ export class FormsController {
     try {
       await this.formService.archiveForm({
         where: {
-          id_created_by_id: {
-            id,
-            created_by_id: session.user.userId,
-          },
+          id,
         },
-        data: {
-          last_updated_by_user: {
-            connect: {
-              id: session.user.userId,
-            },
-          },
-        },
+        userId: session.user.id,
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -211,19 +198,8 @@ export class FormsController {
   ) {
     try {
       await this.formService.publishForm({
-        where: {
-          id_created_by_id: {
-            id,
-            created_by_id: session.user.userId,
-          },
-        },
-        data: {
-          last_updated_by_user: {
-            connect: {
-              id: session.user.userId,
-            },
-          },
-        },
+        where: { id },
+        userId: session.user.id,
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -253,18 +229,9 @@ export class FormsController {
     try {
       await this.formService.unPublishForm({
         where: {
-          id_created_by_id: {
-            id,
-            created_by_id: session.user.userId,
-          },
+          id,
         },
-        data: {
-          last_updated_by_user: {
-            connect: {
-              id: session.user.userId,
-            },
-          },
-        },
+        userId: session.user.id,
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -294,18 +261,9 @@ export class FormsController {
     try {
       await this.formService.restoreForm({
         where: {
-          id_created_by_id: {
-            id,
-            created_by_id: session.user.userId,
-          },
+          id,
         },
-        data: {
-          last_updated_by_user: {
-            connect: {
-              id: session.user.userId,
-            },
-          },
-        },
+        userId: session.user.id,
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

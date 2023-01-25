@@ -55,482 +55,491 @@ enum feedback_sentiment {
 // tables
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
-  password        String
-  first_name      String
-  last_name       String?
-  avatar_url      String?
-  is_active       Boolean   @default(true)
-  created_at      DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  firstName     String    @map("first_name")
+  lastName      String?   @map("last_name")
+  avatarUrl     String?   @map("avatar_url")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  event_logs                              EventLog[]
-  created_forms                           Form[]                    @relation("created_by_user")
-  last_updated_forms                      Form[]                    @relation("last_updated_by_user")
-  created_file_uploads                    FileUpload[]              @relation("created_by_user")
-  last_updated_file_uploads               FileUpload[]              @relation("last_updated_by_user")
-  last_updated_quiz_settings              FormQuizSetting[]
-  last_updated_form_response_settings     FormResponseSetting[]
-  last_updated_form_presentation_settings FormPresentationSetting[]
-  created_choice_questions                ChoiceQuestion[]          @relation("created_by_user")
-  last_updated_choice_questions           ChoiceQuestion[]          @relation("last_updated_by_user")
-  created_file_upload_questions           FileUploadQuestion[]      @relation("created_by_user")
-  last_updated_file_upload_questions      FileUploadQuestion[]      @relation("last_updated_by_user")
-  created_date_questions                  DateQuestion[]            @relation("created_by_user")
-  last_updated_date_questions             DateQuestion[]            @relation("last_updated_by_user")
-  created_nps_questions                   NpsQuestion[]             @relation("created_by_user")
-  last_updated_nps_questions              NpsQuestion[]             @relation("last_updated_by_user")
-  created_rating_questions                RatingQuestion[]          @relation("created_by_user")
-  last_updated_rating_questions           RatingQuestion[]          @relation("last_updated_by_user")
-  created_info_questions                  InfoQuestion[]            @relation("created_by_user")
-  last_updated_info_questions             InfoQuestion[]            @relation("last_updated_by_user")
-  created_text_questions                  TextQuestion[]            @relation("created_by_user")
-  last_updated_text_questions             TextQuestion[]            @relation("last_updated_by_user")
-  created_options                         Option[]                  @relation("created_by_user")
-  last_updated_options                    Option[]                  @relation("last_updated_by_user")
-  created_feedbacks                       Feedback[]                @relation("created_by_user")
-  last_updated_feedbacks                  Feedback[]                @relation("last_updated_by_user")
-  created_feedback_links                  FeedbackLink[]            @relation("created_by_user")
-  last_updated_feedback_links             FeedbackLink[]            @relation("last_updated_by_user")
-  created_gradings                        Grading[]                 @relation("created_by_user")
-  last_updated_gradings                   Grading[]                 @relation("last_updated_by_user")
-  create_grading_correct_options          GradingCorrectOption[]    @relation("created_by_user")
-  last_updated_grading_correct_options    GradingCorrectOption[]    @relation("last_updated_by_user")
+  eventLogs                           EventLog[]
+  createdForms                        Form[]                    @relation("createdByUser")
+  lastUpdatedForms                    Form[]                    @relation("lastUpdatedByUser")
+  createdFileUploads                  FileUpload[]              @relation("createdByUser")
+  lastUpdatedFileUploads              FileUpload[]              @relation("lastUpdatedByUser")
+  createdFormQuizSettings             FormQuizSetting[]         @relation("createdByUser")
+  lastUpdatedFormQuizSettings         FormQuizSetting[]         @relation("lastUpdatedByUser")
+  createdFormResponseSettings         FormResponseSetting[]     @relation("createdByUser")
+  lastUpdatedFormResponseSettings     FormResponseSetting[]     @relation("lastUpdatedByUser")
+  createdFormPresentationSettings     FormPresentationSetting[] @relation("createdByUser")
+  lastUpdatedFormPresentationSettings FormPresentationSetting[] @relation("lastUpdatedByUser")
+  createdChoiceQuestions              ChoiceQuestion[]          @relation("createdByUser")
+  lastUpdatedChoiceQuestions          ChoiceQuestion[]          @relation("lastUpdatedByUser")
+  createdFileUploadQuestions          FileUploadQuestion[]      @relation("createdByUser")
+  lastUpdatedFileUploadQuestions      FileUploadQuestion[]      @relation("lastUpdatedByUser")
+  createdDateQuestions                DateQuestion[]            @relation("createdByUser")
+  lastUpdatedDateQuestions            DateQuestion[]            @relation("lastUpdatedByUser")
+  createdNpsQuestions                 NpsQuestion[]             @relation("createdByUser")
+  lastUpdatedNpsQuestions             NpsQuestion[]             @relation("lastUpdatedByUser")
+  createdRatingQuestions              RatingQuestion[]          @relation("createdByUser")
+  lastUpdatedRatingQuestions          RatingQuestion[]          @relation("lastUpdatedByUser")
+  createdInfoQuestions                InfoQuestion[]            @relation("createdByUser")
+  lastUpdatedInfoQuestions            InfoQuestion[]            @relation("lastUpdatedByUser")
+  createdTextQuestions                TextQuestion[]            @relation("createdByUser")
+  lastUpdatedTextQuestions            TextQuestion[]            @relation("lastUpdatedByUser")
+  createdOptions                      Option[]                  @relation("createdByUser")
+  lastUpdatedOptions                  Option[]                  @relation("lastUpdatedByUser")
+  createdFeedbacks                    Feedback[]                @relation("createdByUser")
+  lastUpdatedFeedbacks                Feedback[]                @relation("lastUpdatedByUser")
+  createdFeedbackLinks                FeedbackLink[]            @relation("createdByUser")
+  lastUpdatedFeedbackLinks            FeedbackLink[]            @relation("lastUpdatedByUser")
+  createdGradings                     Grading[]                 @relation("createdByUser")
+  lastUpdatedGradings                 Grading[]                 @relation("lastUpdatedByUser")
+  createGradingCorrectOptions         GradingCorrectOption[]    @relation("createdByUser")
+  lastUpdatedGradingCorrectOptions    GradingCorrectOption[]    @relation("lastUpdatedByUser")
 
-  @@index([first_name])
   @@map("users")
 }
 
 model FileUpload {
-  id                 Int      @id @default(autoincrement())
-  name               String
-  alt_text           String?
-  caption            String?
-  width              Int
-  height             Int
-  formats            Json?
-  hash               String
-  extension          String
-  mime               String
-  size               Float
-  url                String
-  preview_url        String
-  created_by_id      Int
-  last_updated_by_id Int
-  created_at         DateTime @default(now()) @db.Timestamptz(3)
+  id              Int      @id @default(autoincrement())
+  name            String
+  altText         String?  @map("alt_text")
+  caption         String?
+  width           Int
+  height          Int
+  formats         Json?
+  hash            String
+  extension       String
+  mime            String
+  size            Float
+  url             String
+  previewUrl      String   @map("preview_url")
+  createdById     Int      @map("created_by_id")
+  lastUpdatedById Int      @map("last_updated_by_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   // relations
-  created_by_user      User               @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User               @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
-  forms                Form[]
-  options              Option[]
-  file_upload_answers  FileUploadAnswer[]
+  createdByUser     User               @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User               @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  forms             Form[]
+  options           Option[]
+  fileUploadAnswers FileUploadAnswer[]
 
   @@map("file_uploads")
 }
 
 model Form {
-  id                        Int       @id @default(autoincrement())
-  title                     String
-  header_img_file_upload_id Int?
-  description               String?
-  is_active                 Boolean   @default(true)
-  created_by_id             Int
-  is_published              Boolean   @default(false)
-  last_updated_by_id        Int?
-  created_at                DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at           DateTime? @updatedAt @db.Timestamptz(3)
+  id                    Int       @id @default(autoincrement())
+  title                 String
+  headerImgFileUploadId Int?      @map("header_img_file_upload_id")
+  description           String?
+  isActive              Boolean   @default(true) @map("is_active")
+  createdById           Int       @map("created_by_id")
+  isPublished           Boolean   @default(false) @map("is_published")
+  lastUpdatedById       Int?      @map("last_updated_by_id")
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt         DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  created_by_user      User                     @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User?                    @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
-  header_img           FileUpload?              @relation(fields: [header_img_file_upload_id], references: [id])
-  responses            Response[]
-  quiz_setting         FormQuizSetting?
-  response_setting     FormResponseSetting?
-  presentation_setting FormPresentationSetting?
+  createdByUser       User                     @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser   User?                    @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  headerImg           FileUpload?              @relation(fields: [headerImgFileUploadId], references: [id])
+  responses           Response[]
+  quizSetting         FormQuizSetting?
+  responseSetting     FormResponseSetting?
+  presentationSetting FormPresentationSetting?
 
-  @@unique([id, created_by_id])
   @@map("forms")
 }
 
 model FormQuizSetting {
-  id                        Int       @id @default(autoincrement())
-  form_id                   Int       @unique
-  default_point_value       Int       @default(0)
-  release_score_immediately Boolean   @default(false)
-  view_missed_questions     Boolean   @default(true)
-  view_correct_answers      Boolean   @default(true)
-  view_point_values         Boolean   @default(true)
-  created_at                DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at           DateTime? @updatedAt @db.Timestamptz(3)
-  last_updated_by_id        Int?
+  id                      Int       @id @default(autoincrement())
+  formId                  Int       @unique @map("form_id")
+  defaultPointValue       Int       @default(0) @map("default_point_value")
+  releaseScoreImmediately Boolean   @default(false) @map("release_score_immediately")
+  viewMissedQuestions     Boolean   @default(true) @map("view_missed_questions")
+  viewCorrectAnswers      Boolean   @default(true) @map("view_correct_answers")
+  viewPointValues         Boolean   @default(true) @map("view_point_values")
+  createdById             Int       @map("created_by_id")
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt           DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  lastUpdatedById         Int?      @map("last_updated_by_id")
 
   // relations
-  form Form  @relation(fields: [form_id], references: [id])
-  user User? @relation(fields: [last_updated_by_id], references: [id])
+  form              Form  @relation(fields: [formId], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("form_quiz_settings")
 }
 
 model FormResponseSetting {
-  id                     Int       @id @default(autoincrement())
-  form_id                Int       @unique
-  all_questions_required Boolean   @default(true)
-  single_response        Boolean   @default(true)
-  last_updated_at        DateTime? @updatedAt @db.Timestamptz(3)
-  last_updated_by_id     Int?
+  id                   Int       @id @default(autoincrement())
+  formId               Int       @unique @map("form_id")
+  allQuestionsRequired Boolean   @default(true) @map("all_questions_required")
+  singleResponse       Boolean   @default(true) @map("single_response")
+  createdById          Int       @map("created_by_id")
+  lastUpdatedAt        DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  lastUpdatedById      Int?      @map("last_updated_by_id")
 
   // relations
-  user User? @relation(fields: [last_updated_by_id], references: [id])
-  form Form  @relation(fields: [form_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  form              Form  @relation(fields: [formId], references: [id])
 
   @@map("form_response_settings")
 }
 
 model FormPresentationSetting {
-  id                 Int       @id @default(autoincrement())
-  form_id            Int       @unique
-  show_progress_bar  Boolean   @default(false)
-  shuffle_question   Boolean   @default(false)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  formId          Int       @unique @map("form_id")
+  showProgressBar Boolean   @default(false) @map("show_progress_bar")
+  shuffleQuestion Boolean   @default(false) @map("shuffle_question")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  user User? @relation(fields: [last_updated_by_id], references: [id])
-  form Form  @relation(fields: [form_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  form              Form  @relation(fields: [formId], references: [id])
 
   @@map("form_presentation_settings")
 }
 
 model ChoiceQuestion {
-  id                 Int         @id @default(autoincrement())
-  content            String
-  type               choice_type
-  shuffle_options    Boolean     @default(false)
-  is_active          Boolean     @default(true)
-  created_at         DateTime    @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime?   @updatedAt @db.Timestamptz(3)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int         @id @default(autoincrement())
+  content         String
+  type            choice_type
+  shuffleOptions  Boolean     @default(false) @map("shuffle_options")
+  isActive        Boolean     @default(true) @map("is_active")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  createdById     Int         @map("created_by_id")
+  lastUpdatedById Int?        @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("choice_questions")
 }
 
 model FileUploadQuestion {
-  id                  Int         @id @default(autoincrement())
-  content             String
-  max_file_size       Int
-  max_files           Int
-  accepted_file_types file_type[]
-  created_at          DateTime    @default(now()) @db.Timestamptz(3)
-  last_updated_at     DateTime?   @updatedAt @db.Timestamptz(3)
-  is_active           Boolean     @default(true)
-  created_by_id       Int
-  last_updated_by_id  Int?
+  id                Int         @id @default(autoincrement())
+  content           String
+  maxFileSize       Int         @map("max_file_size")
+  maxFiles          Int         @map("max_files")
+  acceptedFileTypes file_type[] @map("accepted_file_types")
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt     DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive          Boolean     @default(true) @map("is_active")
+  createdById       Int         @map("created_by_id")
+  lastUpdatedById   Int?        @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("file_upload_questions")
 }
 
 model DateQuestion {
-  id                 Int       @id @default(autoincrement())
-  content            String
-  include_year       Boolean   @default(true)
-  include_time       Boolean   @default(true)
-  created_at         DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  is_active          Boolean   @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  content         String
+  includeYear     Boolean   @default(true) @map("include_year")
+  includeTime     Boolean   @default(true) @map("include_time")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("date_questions")
 }
 
 model NpsQuestion {
-  id                 Int       @id @default(autoincrement())
-  content            String
-  high               Int
-  low                Int
-  low_label          String
-  high_label         String
-  created_at         DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  is_active          Boolean   @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  content         String
+  high            Int
+  low             Int
+  lowLabel        String    @map("low_label")
+  highLabel       String    @map("high_label")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("nps_questions")
 }
 
 model RatingQuestion {
-  id                 Int         @id @default(autoincrement())
-  content            String
-  type               rating_type
-  high               Int
-  low                Int
-  low_label          String
-  high_label         String
-  created_at         DateTime    @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime?   @updatedAt @db.Timestamptz(3)
-  is_active          Boolean     @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int         @id @default(autoincrement())
+  content         String
+  type            rating_type
+  high            Int
+  low             Int
+  lowLabel        String      @map("low_label")
+  highLabel       String      @map("high_label")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean     @default(true) @map("is_active")
+  createdById     Int         @map("created_by_id")
+  lastUpdatedById Int?        @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("rating_questions")
 }
 
 model InfoQuestion {
-  id                 Int       @id @default(autoincrement())
-  content            String
-  type               info_type
-  created_at         DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  is_active          Boolean   @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  content         String
+  type            info_type
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("info_questions")
 }
 
 model TextQuestion {
-  id                 Int       @id @default(autoincrement())
-  content            String
-  paragraph          Boolean   @default(false)
-  created_at         DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  is_active          Boolean   @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  content         String
+  paragraph       Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("text_questions")
 }
 
 model Option {
-  id                 Int           @id @default(autoincrement())
-  question_id        Int
-  content            String
-  image_file_id      Int?
-  position           Int
-  question_type      question_type
-  created_at         DateTime      @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime?     @updatedAt @db.Timestamptz(3)
-  is_active          Boolean       @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int           @id @default(autoincrement())
+  questionId      Int           @map("question_id")
+  content         String
+  imageFileId     Int?          @map("image_file_id")
+  position        Int
+  questionType    question_type @map("question_type")
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean       @default(true) @map("is_active")
+  createdById     Int           @map("created_by_id")
+  lastUpdatedById Int?          @map("last_updated_by_id")
 
   // relations
-  grading_correct_option GradingCorrectOption?
-  file_upload            FileUpload?           @relation(fields: [image_file_id], references: [id])
-  created_by_user        User                  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user   User?                 @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  gradingCorrectOption GradingCorrectOption?
+  fileUpload           FileUpload?           @relation(fields: [imageFileId], references: [id])
+  createdByUser        User                  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser    User?                 @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
-  @@unique([id, question_id])
+  @@unique([id, questionId])
   @@map("options")
 }
 
 model Feedback {
-  id                 Int                @id @default(autoincrement())
-  content            String
-  sentiment          feedback_sentiment
-  created_at         DateTime           @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime?          @updatedAt @db.Timestamptz(3)
-  is_active          Boolean            @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int                @id @default(autoincrement())
+  content         String
+  sentiment       feedback_sentiment
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?          @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean            @default(true) @map("is_active")
+  createdById     Int                @map("created_by_id")
+  lastUpdatedById Int?               @map("last_updated_by_id")
 
   // relations
-  created_by_user         User      @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user    User?     @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
-  right_grading_feedbacks Grading[] @relation("feedback_when_right")
-  wrong_grading_feedbacks Grading[] @relation("feedback_when_wrong")
-  Grade                   Grade[]
+  createdByUser         User      @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser     User?     @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  rightGradingFeedbacks Grading[] @relation("feedbackWhenRight")
+  wrongGradingFeedbacks Grading[] @relation("feedbackWhenWrong")
+  grades                Grade[]
 
   @@map("feedbacks")
 }
 
 model FeedbackLink {
-  id                 Int      @id @default(autoincrement())
-  feedback_id        Int
-  link_text          String
-  link               String
-  created_at         DateTime @default(now()) @db.Timestamptz(3)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int      @id @default(autoincrement())
+  feedbackId      Int      @map("feedback_id")
+  linkText        String   @map("link_text")
+  link            String
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdById     Int      @map("created_by_id")
+  lastUpdatedById Int?     @map("last_updated_by_id")
 
   // relations
-  created_by_user      User  @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User? @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("feedback_links")
 }
 
 model Grading {
-  id                     Int           @id @default(autoincrement())
-  question_id            String
-  question_type          question_type
-  point_value            Int
-  feedback_id_when_right Int?
-  feedback_id_when_wrong Int?
-  created_at             DateTime      @default(now()) @db.Timestamptz(3)
-  last_updated_at        DateTime?     @updatedAt @db.Timestamptz(3)
-  created_by_id          Int
-  last_updated_by_id     Int?
+  id                  Int           @id @default(autoincrement())
+  questionId          String        @map("question_id")
+  questionType        question_type @map("question_type")
+  pointValue          Int           @map("point_value")
+  feedbackIdWhenRight Int?          @map("feedback_id_when_right")
+  feedbackIdWhenWrong Int?          @map("feedback_id_when_wrong")
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt       DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  createdById         Int           @map("created_by_id")
+  lastUpdatedById     Int?          @map("last_updated_by_id")
 
   // relations
-  correct_options      GradingCorrectOption[]
-  created_by_user      User                   @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User?                  @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
-  feedback_when_right  Feedback?              @relation("feedback_when_right", fields: [feedback_id_when_right], references: [id])
-  feedback_when_wrong  Feedback?              @relation("feedback_when_wrong", fields: [feedback_id_when_wrong], references: [id])
+  correctOptions    GradingCorrectOption[]
+  createdByUser     User                   @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User?                  @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
+  feedbackWhenRight Feedback?              @relation("feedbackWhenRight", fields: [feedbackIdWhenRight], references: [id])
+  feedbackWhenWrong Feedback?              @relation("feedbackWhenWrong", fields: [feedbackIdWhenWrong], references: [id])
 
-  @@unique([id, question_id])
+  @@unique([id, questionId])
   @@map("gradings")
 }
 
 model GradingCorrectOption {
-  id                 Int       @id @default(autoincrement())
-  grading_id         Int
-  option_id          Int       @unique
-  created_at         DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at    DateTime? @updatedAt @db.Timestamptz(3)
-  is_active          Boolean   @default(true)
-  created_by_id      Int
-  last_updated_by_id Int?
+  id              Int       @id @default(autoincrement())
+  gradingId       Int       @map("grading_id")
+  optionId        Int       @unique @map("option_id")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdById     Int       @map("created_by_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
 
   // relations
-  grading              Grading @relation(fields: [grading_id], references: [id])
-  option               Option  @relation(fields: [option_id], references: [id])
-  created_by_user      User    @relation("created_by_user", fields: [created_by_id], references: [id])
-  last_updated_by_user User?   @relation("last_updated_by_user", fields: [last_updated_by_id], references: [id])
+  grading           Grading @relation(fields: [gradingId], references: [id])
+  option            Option  @relation(fields: [optionId], references: [id])
+  createdByUser     User    @relation("createdByUser", fields: [createdById], references: [id])
+  lastUpdatedByUser User?   @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
   @@map("grading_correct_options")
 }
 
 model Response {
-  id               Int       @id @default(autoincrement())
-  form_id          Int
-  respondent_email String
-  total_score      Int
-  answers          Answer[]
-  created_at       DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at  DateTime? @updatedAt @db.Timestamptz(3)
+  id              Int       @id @default(autoincrement())
+  formId          Int       @map("form_id")
+  respondentEmail String    @map("respondent_email")
+  totalScore      Int       @map("total_score")
+  answers         Answer[]
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  form Form @relation(fields: [form_id], references: [id])
+  form Form @relation(fields: [formId], references: [id])
 
   @@map("responses")
 }
 
 model Answer {
-  id              Int           @id @default(autoincrement())
-  question_id     Int
-  question_type   question_type
-  response_id     Int
-  created_at      DateTime      @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime?     @updatedAt @db.Timestamptz(3)
+  id            Int           @id @default(autoincrement())
+  questionId    Int           @map("question_id")
+  questionType  question_type @map("question_type")
+  responseId    Int           @map("response_id")
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
   textAnswers       TextAnswer[]
   fileUploadAnswers FileUploadAnswer[]
-  response          Response           @relation(fields: [response_id], references: [id])
+  response          Response           @relation(fields: [responseId], references: [id])
   grade             Grade?
 
   @@map("answers")
 }
 
 model TextAnswer {
-  id              Int       @id @default(autoincrement())
-  value           String
-  answer_id       Int
-  created_at      DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  id            Int       @id @default(autoincrement())
+  value         String
+  answerId      Int       @map("answer_id")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  answer Answer @relation(fields: [answer_id], references: [id])
+  answer Answer @relation(fields: [answerId], references: [id])
 
   @@map("text_answers")
 }
 
 model FileUploadAnswer {
-  id              Int       @id @default(autoincrement())
-  file_upload_id  Int
-  answer_id       Int
-  created_at      DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  id            Int       @id @default(autoincrement())
+  fileUploadId  Int       @map("file_upload_id")
+  answerId      Int       @map("answer_id")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  answer      Answer     @relation(fields: [answer_id], references: [id])
-  file_upload FileUpload @relation(fields: [file_upload_id], references: [id])
+  answer     Answer     @relation(fields: [answerId], references: [id])
+  fileUpload FileUpload @relation(fields: [fileUploadId], references: [id])
 
   @@map("file_upload_answers")
 }
 
 model Grade {
-  id              Int       @id @default(autoincrement())
-  answer_id       Int       @unique
-  is_correct      Boolean
-  feedback_id     Int?
-  score           Int
-  created_at      DateTime  @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime? @updatedAt @db.Timestamptz(3)
+  id            Int       @id @default(autoincrement())
+  answerId      Int       @unique @map("answer_id")
+  isCorrect     Boolean   @map("is_correct")
+  feedbackId    Int?      @map("feedback_id")
+  score         Int
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
-  answer   Answer?   @relation(fields: [answer_id], references: [id])
-  feedback Feedback? @relation(fields: [feedback_id], references: [id])
+  answer   Answer?   @relation(fields: [answerId], references: [id])
+  feedback Feedback? @relation(fields: [feedbackId], references: [id])
 
   @@map("grades")
 }
 
 model EventType {
-  id              Int        @id @default(autoincrement())
-  name            String     @unique
-  created_at      DateTime   @default(now()) @db.Timestamptz(3)
-  last_updated_at DateTime?  @updatedAt @db.Timestamptz(3)
-  event_logs      EventLog[]
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+
+  // relations
+  eventLogs EventLog[]
 
   @@map("event_types")
 }
 
 model EventLog {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  event_type_id Int
-  context       Json?
-  created_at    DateTime @default(now()) @db.Timestamptz(3)
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  eventTypeId Int      @map("event_type_id")
+  context     Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   // relations
-  user       User      @relation(fields: [user_id], references: [id])
-  event_type EventType @relation(fields: [event_type_id], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  eventType EventType @relation(fields: [eventTypeId], references: [id])
 
   @@map("event_logs")
 }

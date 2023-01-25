@@ -4,8 +4,8 @@ export type UserSession = Session &
   Record<
     'user',
     {
-      userId: number;
-      userEmail: string;
+      id: number;
+      email: string;
       userAgent: string;
       ipAddress: string;
       lastLogin: string;

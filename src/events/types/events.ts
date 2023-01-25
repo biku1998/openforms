@@ -5,4 +5,9 @@ export enum AppEventType {
   FORM_RESTORED = 'form.restored',
   FORM_PUBLISHED = 'form.published',
   FORM_UNPUBLISHED = 'form.unpublished',
+  FORM_QUIZ_SETTING_CREATED = 'form.quiz.setting.created',
+  FORM_QUIZ_SETTING_UPDATED = 'form.quiz.setting.updated',
+  FORM_QUIZ_SETTING_DELETED = 'form.quiz.setting.deleted',
+  FORM_PRESENTATION_SETTING_UPDATED = 'form.presentation.setting.updated',
+  FORM_RESPONSE_SETTING_UPDATED = 'form.response.setting.updated',
 }
