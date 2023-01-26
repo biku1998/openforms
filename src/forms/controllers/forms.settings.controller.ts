@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -14,6 +15,8 @@ import {
 import { Prisma } from '@prisma/client';
 import { UserSession } from 'src/utils/types';
 import { FormQuizSettingDto } from '../dtos';
+import { FormPresentationSettingDto } from '../dtos/form-presentation-setting.dto';
+import { FormResponseSettingDto } from '../dtos/form-response-setting.dto';
 import { FormsSettingsService } from '../services';
 
 @Controller({
@@ -23,7 +26,7 @@ import { FormsSettingsService } from '../services';
 export class FormsSettingsController {
   constructor(private readonly formsSettingsService: FormsSettingsService) {}
 
-  @Post('quiz_settings')
+  @Post('quizSettings')
   async createFormQuizSetting(
     @GetSession() session: UserSession,
     @Param(
@@ -71,7 +74,7 @@ export class FormsSettingsController {
     }
   }
 
-  @Patch('quiz_settings')
+  @Patch('quizSettings')
   async updateFormQuizSetting(
     @GetSession() session: UserSession,
     @Param(
@@ -98,7 +101,7 @@ export class FormsSettingsController {
                 id,
               },
             },
-            createdByUser: {
+            lastUpdatedByUser: {
               connect: {
                 id: session.user.id,
               },
@@ -118,7 +121,7 @@ export class FormsSettingsController {
     }
   }
 
-  @Delete('quiz_settings')
+  @Delete('quizSettings')
   async deleteFormQuizSetting(
     @GetSession() session: UserSession,
     @Param(
@@ -130,26 +133,196 @@ export class FormsSettingsController {
       }),
     )
     id: number,
-    @Body() formQuizSettingDto: FormQuizSettingDto,
   ) {
     try {
       const formQuizSetting =
-        await this.formsSettingsService.createFormQuizSetting({
+        await this.formsSettingsService.deleteFormQuizSetting({
+          where: {
+            formId: id,
+          },
+          userId: session.user.id,
+        });
+      return formQuizSetting;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Patch('presentationSettings')
+  async updateFormPresentationSetting(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+    @Body() formPresentationSettingDto: FormPresentationSettingDto,
+  ) {
+    try {
+      const formPresentationSetting =
+        await this.formsSettingsService.updateFormPresentationSetting({
+          where: {
+            formId: id,
+          },
           data: {
-            ...formQuizSettingDto,
-            form: {
-              connect: {
-                id,
-              },
-            },
-            createdByUser: {
+            ...formPresentationSettingDto,
+            lastUpdatedByUser: {
               connect: {
                 id: session.user.id,
               },
             },
           },
         });
+      return formPresentationSetting;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Patch('responseSettings')
+  async updateFormResponseSetting(
+    @GetSession() session: UserSession,
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+    @Body() formResponseSettingDto: FormResponseSettingDto,
+  ) {
+    try {
+      const formResponseSetting =
+        await this.formsSettingsService.updateFormResponseSetting({
+          where: {
+            formId: id,
+          },
+          data: {
+            ...formResponseSettingDto,
+            lastUpdatedByUser: {
+              connect: {
+                id: session.user.id,
+              },
+            },
+          },
+        });
+      return formResponseSetting;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Get('quizSettings')
+  async getFormQuizSetting(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      const formQuizSetting =
+        await this.formsSettingsService.getFormQuizSetting({
+          where: {
+            formId: id,
+          },
+        });
       return formQuizSetting;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Get('presentationSettings')
+  async getFormPresentationSetting(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      const formPresentationSetting =
+        await this.formsSettingsService.getFormPresentationSetting({
+          where: {
+            formId: id,
+          },
+        });
+      return formPresentationSetting;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('form does not exists');
+        }
+      }
+      throw new InternalServerErrorException(
+        'Oops! Something went really wrong',
+      );
+    }
+  }
+
+  @Get('responseSettings')
+  async getResponseSetting(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('id must be a number');
+        },
+      }),
+    )
+    id: number,
+  ) {
+    try {
+      const formResponseSetting =
+        await this.formsSettingsService.getFormResponseSetting({
+          where: {
+            formId: id,
+          },
+        });
+      return formResponseSetting;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {

@@ -11,5 +11,5 @@ export class UpdateFormDto {
 
   @IsOptional()
   @IsNumber()
-  readonly header_img_file_upload_id?: number;
+  readonly headerImgFileUploadId?: number;
 }

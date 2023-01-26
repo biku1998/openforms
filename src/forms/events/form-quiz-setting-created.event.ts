@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import _omit from 'lodash/omit';
 import BaseEvent from 'src/events/base.event';
 import { AppEventType } from 'src/events/types/events';
 
@@ -20,6 +21,6 @@ export class FormQuizSettingCreatedEvent extends BaseEvent {
   }
 
   getPayload() {
-    return { form_id: this.payload.formId, payload: this.payload };
+    return _omit(this.payload, ['userId']);
   }
 }

@@ -49,7 +49,7 @@ export class FormsSettingsService {
     data,
     where,
   }: {
-    data: Prisma.FormQuizSettingCreateInput;
+    data: Prisma.FormQuizSettingUpdateInput;
     where: Prisma.FormQuizSettingWhereUniqueInput;
   }): Promise<FormQuizSetting> {
     const updatedFormQuizSetting =
@@ -73,8 +73,10 @@ export class FormsSettingsService {
 
   async deleteFormQuizSetting({
     where,
+    userId,
   }: {
-    where: Prisma.FormQuizSettingWhereUniqueInput & { loggedInUserId: number };
+    where: Prisma.FormQuizSettingWhereUniqueInput;
+    userId: number;
   }) {
     await this.prismaService.formQuizSetting.delete({
       where,
@@ -85,7 +87,7 @@ export class FormsSettingsService {
       AppEventType.FORM_QUIZ_SETTING_UPDATED,
       new FormQuizSettingDeletedEvent({
         formId: where.formId,
-        userId: where.loggedInUserId,
+        userId,
       }),
     );
   }
@@ -109,7 +111,7 @@ export class FormsSettingsService {
       new FormPresentationSettingUpdatedEvent({
         formId: where.formId,
         payload: data,
-        userId: data.createdByUser.connect.id,
+        userId: data.lastUpdatedByUser.connect.id,
       }),
     );
 
@@ -134,9 +136,46 @@ export class FormsSettingsService {
       new FormResponseSettingUpdatedEvent({
         formId: where.formId,
         payload: data,
-        userId: data.createdByUser.connect.id,
+        userId: data.lastUpdatedByUser.connect.id,
       }),
     );
     return updatedFormResponseSetting;
+  }
+
+  async getFormResponseSetting({
+    where,
+  }: {
+    where: Prisma.FormResponseSettingWhereUniqueInput;
+  }): Promise<FormResponseSetting> {
+    const formResponseSetting =
+      await this.prismaService.formResponseSetting.findUnique({
+        where,
+      });
+    return formResponseSetting;
+  }
+
+  async getFormPresentationSetting({
+    where,
+  }: {
+    where: Prisma.FormPresentationSettingWhereUniqueInput;
+  }): Promise<FormPresentationSetting> {
+    const formPresentationSetting =
+      await this.prismaService.formPresentationSetting.findUnique({
+        where,
+      });
+    return formPresentationSetting;
+  }
+
+  async getFormQuizSetting({
+    where,
+  }: {
+    where: Prisma.FormQuizSettingWhereUniqueInput;
+  }): Promise<FormQuizSetting> {
+    const formQuizSetting = await this.prismaService.formQuizSetting.findUnique(
+      {
+        where,
+      },
+    );
+    return formQuizSetting;
   }
 }

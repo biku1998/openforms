@@ -1,4 +1,10 @@
 export enum AppEventType {
+  // users
+  USER_SIGNED_UP = 'user.signup',
+  USER_LOGGED_IN = 'user.login',
+  USER_LOGGED_OUT = 'user.logout',
+
+  // forms
   FORM_CREATED = 'form.created',
   FORM_UPDATED = 'form.updated',
   FORM_ARCHIVED = 'form.archived',

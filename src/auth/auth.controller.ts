@@ -10,19 +10,25 @@ import {
   Session as GetSession,
   UnauthorizedException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AppEventType } from 'src/events/types/events';
 
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { Public } from 'src/utils/public.decorator';
 import { UserSession } from 'src/utils/types';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { UserLoggedOutEvent } from './events/auth.event';
 
 @Controller({
   version: '1',
   path: 'auth',
 })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
@@ -72,6 +78,14 @@ export class AuthController {
     return new Promise((resolve, reject) => {
       session.destroy((err) => {
         if (err) reject(err);
+
+        // fire events
+        this.eventEmitter.emit(
+          AppEventType.USER_LOGGED_OUT,
+          new UserLoggedOutEvent({
+            userId: session.user.id,
+          }),
+        );
         resolve(null);
       });
     });

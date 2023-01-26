@@ -30,7 +30,7 @@ export class FormsController {
   async getForms(
     @GetSession() session: UserSession,
     @Query('state', new DefaultValuePipe(ItemState.active)) state?: string,
-    @Query('search_string') searchString?: string,
+    @Query('searchString') searchString?: string,
     @Query('sort') sort?: string,
   ): Promise<FormModel[]> {
     if (Object.keys(ItemState).includes(state) === false) {

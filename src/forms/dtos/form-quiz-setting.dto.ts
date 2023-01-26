@@ -3,21 +3,21 @@ import { IsBoolean, IsNumber, IsOptional } from 'class-validator';
 export class FormQuizSettingDto {
   @IsOptional()
   @IsNumber()
-  readonly default_point_value: number;
+  readonly defaultPointValue: number;
 
   @IsOptional()
   @IsBoolean()
-  readonly release_score_immediately: boolean;
+  readonly releaseScoreImmediately: boolean;
 
   @IsOptional()
   @IsBoolean()
-  readonly view_missed_questions: boolean;
+  readonly viewMissedQuestions: boolean;
 
   @IsOptional()
   @IsBoolean()
-  readonly view_correct_answers: boolean;
+  readonly viewCorrectAnswers: boolean;
 
   @IsOptional()
   @IsBoolean()
-  readonly view_point_values: boolean;
+  readonly viewPointValues: boolean;
 }

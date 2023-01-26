@@ -171,7 +171,7 @@ model FormQuizSetting {
   lastUpdatedById         Int?      @map("last_updated_by_id")
 
   // relations
-  form              Form  @relation(fields: [formId], references: [id])
+  form              Form  @relation(fields: [formId], references: [id], onDelete: Cascade)
   createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
   lastUpdatedByUser User? @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 
