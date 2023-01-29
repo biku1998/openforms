@@ -8,13 +8,16 @@ datasource db {
 }
 
 // enums
-enum choice_type {
+
+enum ChoiceType {
   RADIO
   CHECKBOX
   DROP_DOWN
+
+  @@map("choice_type")
 }
 
-enum file_type {
+enum FileType {
   ANY
   DOCUMENT
   PRESENTATION
@@ -23,20 +26,26 @@ enum file_type {
   IMAGE
   VIDEO
   AUDIO
+
+  @@map("file_type")
 }
 
-enum rating_type {
+enum RatingType {
   STAR
   HEART
+
+  @@map("rating_type")
 }
 
-enum info_type {
+enum InfoType {
   WEBSITE
   PHONE
   EMAIL
+
+  @@map("info_type")
 }
 
-enum question_type {
+enum QuestionType {
   CHOICE
   FILE_UPLOAD
   DATE
@@ -44,12 +53,16 @@ enum question_type {
   RATING
   INFO
   TEXT
+
+  @@map("question_type")
 }
 
-enum feedback_sentiment {
+enum FeedbackSentiment {
   POSITIVE
   NEGATIVE
   NEUTRAL
+
+  @@map("feedback_sentiment")
 }
 
 // tables
@@ -153,6 +166,7 @@ model Form {
   quizSetting         FormQuizSetting?
   responseSetting     FormResponseSetting?
   presentationSetting FormPresentationSetting?
+  formQuestions       FormQuestion[]
 
   @@map("forms")
 }
@@ -213,15 +227,15 @@ model FormPresentationSetting {
 }
 
 model ChoiceQuestion {
-  id              Int         @id @default(autoincrement())
-  content         String
-  type            choice_type
-  shuffleOptions  Boolean     @default(false) @map("shuffle_options")
-  isActive        Boolean     @default(true) @map("is_active")
-  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt   DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  createdById     Int         @map("created_by_id")
-  lastUpdatedById Int?        @map("last_updated_by_id")
+  id              Int        @id @default(autoincrement())
+  content         String     @default("")
+  choiceType      ChoiceType @map("choice_type")
+  shuffleOptions  Boolean    @default(false) @map("shuffle_options")
+  isActive        Boolean    @default(true) @map("is_active")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?  @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  createdById     Int        @map("created_by_id")
+  lastUpdatedById Int?       @map("last_updated_by_id")
 
   // relations
   createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
@@ -231,16 +245,16 @@ model ChoiceQuestion {
 }
 
 model FileUploadQuestion {
-  id                Int         @id @default(autoincrement())
-  content           String
-  maxFileSize       Int         @map("max_file_size")
-  maxFiles          Int         @map("max_files")
-  acceptedFileTypes file_type[] @map("accepted_file_types")
-  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt     DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  isActive          Boolean     @default(true) @map("is_active")
-  createdById       Int         @map("created_by_id")
-  lastUpdatedById   Int?        @map("last_updated_by_id")
+  id                Int        @id @default(autoincrement())
+  content           String     @default("")
+  maxFileSize       Int        @default(10) @map("max_file_size")
+  maxFiles          Int        @default(2) @map("max_files")
+  acceptedFileTypes FileType[] @default([]) @map("accepted_file_types")
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt     DateTime?  @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive          Boolean    @default(true) @map("is_active")
+  createdById       Int        @map("created_by_id")
+  lastUpdatedById   Int?       @map("last_updated_by_id")
 
   // relations
   createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
@@ -251,7 +265,7 @@ model FileUploadQuestion {
 
 model DateQuestion {
   id              Int       @id @default(autoincrement())
-  content         String
+  content         String    @default("")
   includeYear     Boolean   @default(true) @map("include_year")
   includeTime     Boolean   @default(true) @map("include_time")
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -269,11 +283,11 @@ model DateQuestion {
 
 model NpsQuestion {
   id              Int       @id @default(autoincrement())
-  content         String
-  high            Int
-  low             Int
-  lowLabel        String    @map("low_label")
-  highLabel       String    @map("high_label")
+  content         String    @default("")
+  high            Int       @default(10)
+  low             Int       @default(1)
+  lowLabel        String    @default("low") @map("low_label")
+  highLabel       String    @default("high") @map("high_label")
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
   isActive        Boolean   @default(true) @map("is_active")
@@ -288,18 +302,18 @@ model NpsQuestion {
 }
 
 model RatingQuestion {
-  id              Int         @id @default(autoincrement())
-  content         String
-  type            rating_type
-  high            Int
-  low             Int
-  lowLabel        String      @map("low_label")
-  highLabel       String      @map("high_label")
-  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt   DateTime?   @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  isActive        Boolean     @default(true) @map("is_active")
-  createdById     Int         @map("created_by_id")
-  lastUpdatedById Int?        @map("last_updated_by_id")
+  id              Int        @id @default(autoincrement())
+  content         String     @default("")
+  ratingType      RatingType @map("rating_type")
+  high            Int        @default(10)
+  low             Int        @default(1)
+  lowLabel        String     @default("low") @map("low_label")
+  highLabel       String     @default("high") @map("high_label")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?  @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean    @default(true) @map("is_active")
+  createdById     Int        @map("created_by_id")
+  lastUpdatedById Int?       @map("last_updated_by_id")
 
   // relations
   createdByUser     User  @relation("createdByUser", fields: [createdById], references: [id])
@@ -310,8 +324,8 @@ model RatingQuestion {
 
 model InfoQuestion {
   id              Int       @id @default(autoincrement())
-  content         String
-  type            info_type
+  content         String    @default("")
+  infoType        InfoType  @map("info_type")
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
   isActive        Boolean   @default(true) @map("is_active")
@@ -327,7 +341,7 @@ model InfoQuestion {
 
 model TextQuestion {
   id              Int       @id @default(autoincrement())
-  content         String
+  content         String    @default("")
   paragraph       Boolean   @default(false)
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   lastUpdatedAt   DateTime? @updatedAt @map("last_updated_at") @db.Timestamptz(3)
@@ -342,18 +356,31 @@ model TextQuestion {
   @@map("text_questions")
 }
 
+model FormQuestion {
+  id           Int          @id @default(autoincrement())
+  formId       Int          @map("form_id")
+  questionId   Int          @map("question_id")
+  questionType QuestionType @map("question_type")
+  position     Int
+
+  // relations
+  form Form @relation(fields: [formId], references: [id])
+
+  @@map("form_questions")
+}
+
 model Option {
-  id              Int           @id @default(autoincrement())
-  questionId      Int           @map("question_id")
+  id              Int          @id @default(autoincrement())
+  questionId      Int          @map("question_id")
   content         String
-  imageFileId     Int?          @map("image_file_id")
+  imageFileId     Int?         @map("image_file_id")
   position        Int
-  questionType    question_type @map("question_type")
-  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt   DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  isActive        Boolean       @default(true) @map("is_active")
-  createdById     Int           @map("created_by_id")
-  lastUpdatedById Int?          @map("last_updated_by_id")
+  questionType    QuestionType @map("question_type")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?    @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean      @default(true) @map("is_active")
+  createdById     Int          @map("created_by_id")
+  lastUpdatedById Int?         @map("last_updated_by_id")
 
   // relations
   gradingCorrectOption GradingCorrectOption?
@@ -366,14 +393,14 @@ model Option {
 }
 
 model Feedback {
-  id              Int                @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   content         String
-  sentiment       feedback_sentiment
-  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt   DateTime?          @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  isActive        Boolean            @default(true) @map("is_active")
-  createdById     Int                @map("created_by_id")
-  lastUpdatedById Int?               @map("last_updated_by_id")
+  sentiment       FeedbackSentiment
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt   DateTime?         @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  isActive        Boolean           @default(true) @map("is_active")
+  createdById     Int               @map("created_by_id")
+  lastUpdatedById Int?              @map("last_updated_by_id")
 
   // relations
   createdByUser         User      @relation("createdByUser", fields: [createdById], references: [id])
@@ -402,16 +429,16 @@ model FeedbackLink {
 }
 
 model Grading {
-  id                  Int           @id @default(autoincrement())
-  questionId          String        @map("question_id")
-  questionType        question_type @map("question_type")
-  pointValue          Int           @map("point_value")
-  feedbackIdWhenRight Int?          @map("feedback_id_when_right")
-  feedbackIdWhenWrong Int?          @map("feedback_id_when_wrong")
-  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt       DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
-  createdById         Int           @map("created_by_id")
-  lastUpdatedById     Int?          @map("last_updated_by_id")
+  id                  Int          @id @default(autoincrement())
+  questionId          String       @map("question_id")
+  questionType        QuestionType @map("question_type")
+  pointValue          Int          @map("point_value")
+  feedbackIdWhenRight Int?         @map("feedback_id_when_right")
+  feedbackIdWhenWrong Int?         @map("feedback_id_when_wrong")
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt       DateTime?    @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  createdById         Int          @map("created_by_id")
+  lastUpdatedById     Int?         @map("last_updated_by_id")
 
   // relations
   correctOptions    GradingCorrectOption[]
@@ -459,12 +486,12 @@ model Response {
 }
 
 model Answer {
-  id            Int           @id @default(autoincrement())
-  questionId    Int           @map("question_id")
-  questionType  question_type @map("question_type")
-  responseId    Int           @map("response_id")
-  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  lastUpdatedAt DateTime?     @updatedAt @map("last_updated_at") @db.Timestamptz(3)
+  id            Int          @id @default(autoincrement())
+  questionId    Int          @map("question_id")
+  questionType  QuestionType @map("question_type")
+  responseId    Int          @map("response_id")
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastUpdatedAt DateTime?    @updatedAt @map("last_updated_at") @db.Timestamptz(3)
 
   // relations
   textAnswers       TextAnswer[]

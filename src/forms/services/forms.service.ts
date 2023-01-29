@@ -137,6 +137,15 @@ export class FormsService {
     return forms;
   }
 
+  async getFormById(id: number): Promise<Form> {
+    const form = await this.prismaService.form.findUnique({
+      where: {
+        id,
+      },
+    });
+    return form;
+  }
+
   async updateForm(params: {
     where: Prisma.FormWhereUniqueInput;
     data: Prisma.FormUpdateInput;

@@ -6,5 +6,6 @@ import { FormsService, FormsSettingsService } from './services';
 @Module({
   providers: [FormsService, FormsSettingsService, FormCreatedListener],
   controllers: [FormsController, FormsSettingsController],
+  exports: [FormsService],
 })
 export class FormsModule {}

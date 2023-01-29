@@ -15,6 +15,7 @@ import {
   Session as GetSession,
 } from '@nestjs/common';
 import { Form as FormModel, Prisma } from '@prisma/client';
+import { PrismaErrorCode } from 'src/shared/errors';
 import { ItemState, UserSession } from 'src/utils/types';
 import { CreateFormDto, UpdateFormDto } from '../dtos';
 import { FormsService } from '../services';
@@ -78,9 +79,7 @@ export class FormsController {
       // if (error instanceof Prisma.PrismaClientKnownRequestError) {
       //   console.log(error.code);
       // }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -115,14 +114,12 @@ export class FormsController {
       return updatedForm;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           throw new NotFoundException('form does not exists');
         }
       }
 
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -145,9 +142,7 @@ export class FormsController {
 
       return form;
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -173,13 +168,11 @@ export class FormsController {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           throw new NotFoundException('form does not exists');
         }
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -203,13 +196,11 @@ export class FormsController {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           throw new NotFoundException('form does not exists');
         }
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -235,13 +226,11 @@ export class FormsController {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           throw new NotFoundException('form does not exists');
         }
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -267,13 +256,11 @@ export class FormsController {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           throw new NotFoundException('form does not exists');
         }
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 }
