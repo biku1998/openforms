@@ -366,6 +366,7 @@ model FormQuestion {
   // relations
   form Form @relation(fields: [formId], references: [id])
 
+  @@unique([formId, questionId])
   @@map("form_questions")
 }
 

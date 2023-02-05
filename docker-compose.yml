@@ -2,7 +2,6 @@ services:
   database:
     container_name: postgres
     image: postgres:15
-    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,7 +13,6 @@ services:
 
   redis:
     image: redis:7.0.5
-    restart: always
     ports:
       - 6379:6379
 
@@ -22,7 +20,6 @@ services:
     container_name: redis-commander
     hostname: redis-commander
     image: ghcr.io/joeferner/redis-commander:latest
-    restart: always
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
@@ -35,7 +32,6 @@ services:
       dockerfile: Dockerfile
       context: .
       target: development
-    restart: always
     env_file:
       - .env
     volumes:

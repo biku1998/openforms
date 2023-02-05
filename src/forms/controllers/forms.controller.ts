@@ -5,7 +5,6 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -14,10 +13,10 @@ import {
   Query,
   Session as GetSession,
 } from '@nestjs/common';
-import { Form as FormModel, Prisma } from '@prisma/client';
-import { PrismaErrorCode } from 'src/shared/errors';
+import { Form as FormModel } from '@prisma/client';
 import { ItemState, UserSession } from 'src/utils/types';
 import { CreateFormDto, UpdateFormDto } from '../dtos';
+import { FormNotFoundException } from '../exceptions';
 import { FormsService } from '../services';
 
 @Controller({
@@ -76,9 +75,6 @@ export class FormsController {
       });
       return forms;
     } catch (error) {
-      // if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      //   console.log(error.code);
-      // }
       throw error;
     }
   }
@@ -113,12 +109,9 @@ export class FormsController {
       });
       return updatedForm;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-
       throw error;
     }
   }
@@ -167,10 +160,8 @@ export class FormsController {
         userId: session.user.id,
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
       throw error;
     }
@@ -195,10 +186,8 @@ export class FormsController {
         userId: session.user.id,
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
       throw error;
     }
@@ -225,10 +214,8 @@ export class FormsController {
         userId: session.user.id,
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
       throw error;
     }
@@ -255,10 +242,8 @@ export class FormsController {
         userId: session.user.id,
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
       throw error;
     }
