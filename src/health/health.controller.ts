@@ -35,8 +35,8 @@ export class HealthController {
           `http://localhost:${this.configService.get('PORT')}`,
         ),
       () =>
-        this.disk.checkStorage('diskStorage', {
-          thresholdPercent: 0.5,
+        this.disk.checkStorage('disk health', {
+          thresholdPercent: 0.7,
           path: '/',
         }),
       () => this.prismaHealthIndicator.pingCheck('postgres'),

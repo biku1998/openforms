@@ -1,0 +1,7 @@
+services:
+  database:
+    volumes:
+      - ./pgdata-test:/var/lib/postgresql/data
+
+  backend:
+    command: bash -c "npm run test:watch"

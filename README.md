@@ -23,12 +23,13 @@
 - nest js
 - prisma
 
-> NOTE : the tools will keep changing as we move forward.
+> NOTE : the tools will keep evolving as we move forward.
 
 ## Setup local development workflow
 
 - make sure you have `docker` up and running
 - clone the repo
+- copy `docker-compose.override.yml.example` content to `docker-compose.override.yml`
 - run `docker-compose up -d`
 
 That's it ✨

@@ -3,3 +3,6 @@ Dockerfile
 node_modules
 npm-debug.log
 dist
+docker-compose.override.yml
+.env*
+!.env.example

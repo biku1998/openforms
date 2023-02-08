@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Body,
   Patch,
+  Get,
 } from '@nestjs/common';
 import { FormNotFoundException } from 'src/forms/exceptions';
 import { UserSession } from 'src/utils/types';
@@ -23,6 +24,22 @@ import { Question, QuestionCreateInput } from '../types/question';
 @Controller('forms/:formId/questions')
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
+
+  @Get()
+  async getQuestions(
+    @GetSession() session: UserSession,
+    @Param(
+      'formId',
+      new ParseIntPipe({
+        exceptionFactory: () => {
+          throw new BadRequestException('formId must be a number');
+        },
+      }),
+    )
+    formId: number,
+  ) {
+    return [];
+  }
 
   @Post()
   async createQuestion(

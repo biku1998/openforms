@@ -56,3 +56,7 @@ dist-ssr
 # custom
 dev-notes.md
 pgdata
+pgdata-test
+.env*
+!.env.example
+docker-compose.override.yml

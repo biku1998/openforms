@@ -12,7 +12,7 @@ import {
   FormUpdatedEvent,
 } from '../events';
 import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
-import { FormNotFoundException } from '../exceptions';
+import { ArchivedFormException, FormNotFoundException } from '../exceptions';
 
 @Injectable()
 export class FormsService {
@@ -172,6 +172,8 @@ export class FormsService {
       },
     });
     if (!form) throw new FormNotFoundException(id);
+
+    if (form.isActive === false) throw new ArchivedFormException(id);
     return form;
   }
 

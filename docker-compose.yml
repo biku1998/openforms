@@ -2,44 +2,29 @@ services:
   database:
     container_name: postgres
     image: postgres:15
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
 
   redis:
     image: redis:7.0.5
-    ports:
-      - 6379:6379
-
-  redis-commander:
-    container_name: redis-commander
-    hostname: redis-commander
-    image: ghcr.io/joeferner/redis-commander:latest
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - '8081:8081'
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
 
   backend:
     container_name: openforms-backend-api
     image: biku1998/openforms-backend-api
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
     build:
       dockerfile: Dockerfile
       context: .
-      target: development
     env_file:
       - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: npm run start:dev
     ports:
-      - 3000:3000
+      - '${PORT}:${PORT}'
     depends_on:
       - database
       - redis
