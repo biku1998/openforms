@@ -4,7 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -12,11 +11,14 @@ import {
   Post,
   Session as GetSession,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { UserSession } from 'src/utils/types';
 import { FormQuizSettingDto } from '../dtos';
 import { FormPresentationSettingDto } from '../dtos/form-presentation-setting.dto';
 import { FormResponseSettingDto } from '../dtos/form-response-setting.dto';
+import {
+  FormNotFoundException,
+  FormQuizSettingAlreadyExistException,
+} from '../exceptions';
 import { FormsSettingsService } from '../services';
 
 @Controller({
@@ -59,18 +61,13 @@ export class FormsSettingsController {
         });
       return formQuizSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2014') {
-          throw new BadRequestException('setting already exists');
-        }
-
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      if (error instanceof FormQuizSettingAlreadyExistException) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
     }
   }
 
@@ -110,14 +107,10 @@ export class FormsSettingsController {
         });
       return formQuizSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -144,14 +137,10 @@ export class FormsSettingsController {
         });
       return formQuizSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -186,14 +175,10 @@ export class FormsSettingsController {
         });
       return formPresentationSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -228,14 +213,10 @@ export class FormsSettingsController {
         });
       return formResponseSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -260,14 +241,10 @@ export class FormsSettingsController {
         });
       return formQuizSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -292,14 +269,10 @@ export class FormsSettingsController {
         });
       return formPresentationSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 
@@ -324,14 +297,10 @@ export class FormsSettingsController {
         });
       return formResponseSetting;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('form does not exists');
-        }
+      if (error instanceof FormNotFoundException) {
+        throw new NotFoundException(error.message);
       }
-      throw new InternalServerErrorException(
-        'Oops! Something went really wrong',
-      );
+      throw error;
     }
   }
 }

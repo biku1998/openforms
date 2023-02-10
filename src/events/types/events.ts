@@ -16,4 +16,11 @@ export enum AppEventType {
   FORM_QUIZ_SETTING_DELETED = 'form.quiz.setting.deleted',
   FORM_PRESENTATION_SETTING_UPDATED = 'form.presentation.setting.updated',
   FORM_RESPONSE_SETTING_UPDATED = 'form.response.setting.updated',
+
+  // questions
+  QUESTION_CREATED = 'question.created',
+  QUESTION_UPDATED = 'question.updated',
+  QUESTION_ARCHIVED = 'question.archived',
+  QUESTION_RESTORED = 'question.restored',
+  QUESTION_DELETED = 'question.deleted',
 }

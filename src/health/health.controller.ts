@@ -32,11 +32,11 @@ export class HealthController {
       () =>
         this.httpHealthIndicator.pingCheck(
           'basic running check',
-          `http://localhost:${this.configService.get('PORT')}`,
+          `http://localhost:${this.configService.get('PORT_API')}`,
         ),
       () =>
-        this.disk.checkStorage('diskStorage', {
-          thresholdPercent: 0.5,
+        this.disk.checkStorage('disk health', {
+          thresholdPercent: 0.7,
           path: '/',
         }),
       () => this.prismaHealthIndicator.pingCheck('postgres'),

@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\":\"sourabh@gmail.com\",\n    \"password\":\"sssh_its_a_secret\",\n    \"first_name\":\"Sourabh\",\n    \"last_name\":\"Kumar\",\n    \"avatar_url\":\"\"\n}",
+							"raw": "{\n    \"email\":\"sourabh@gmail.com\",\n    \"password\":\"sssh_its_a_secret\",\n    \"firstName\":\"Sourabh\",\n    \"lastName\":\"Kumar\",\n    \"avatarUrl\":\"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -47,7 +47,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"biku@gmail.com\",\n    \"password\": \"sssh_its_a_secret\"\n}",
+							"raw": "{\n    \"email\": \"sourabh@gmail.com\",\n    \"password\": \"sssh_its_a_secret\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -161,13 +161,13 @@
 									"disabled": true
 								},
 								{
-									"key": "search_string",
+									"key": "searchString",
 									"value": "102",
 									"disabled": true
 								},
 								{
 									"key": "sort",
-									"value": "created_at,-last_updated_at",
+									"value": "createdAt,-lastUpdatedAt",
 									"disabled": true
 								}
 							]
@@ -182,7 +182,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\":\"skill survey - 4\",\n    \"description\":\"collecting the initial understanding of learners\"\n}",
+							"raw": "{\n    \"title\":\"skill survey for data science program\",\n    \"description\":\"collecting understanding level of learners\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -209,7 +209,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"is_active\":false,\n    \"title\":\"deleted form name\"\n}",
+							"raw": "{\n    \"title\":\"skill survey for data engineering program\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -236,7 +236,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "14"
+									"value": "1"
 								}
 							]
 						}
@@ -269,7 +269,40 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "8"
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore archived form",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/restore",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"restore"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
 								}
 							]
 						}
@@ -302,7 +335,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "50"
+									"value": "1"
 								}
 							]
 						}
@@ -335,7 +368,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "49"
+									"value": "1"
 								}
 							]
 						}
@@ -343,21 +376,12 @@
 					"response": []
 				},
 				{
-					"name": "create form setting",
+					"name": "create form quiz setting",
 					"request": {
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\":\"New form title\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:id/settings?type=quiz",
+							"raw": "{{url}}/{{version}}/forms/:id/quizSettings",
 							"host": [
 								"{{url}}"
 							],
@@ -365,18 +389,12 @@
 								"{{version}}",
 								"forms",
 								":id",
-								"settings"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "quiz"
-								}
+								"quizSettings"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": null
+									"value": "1"
 								}
 							]
 						}
@@ -384,13 +402,13 @@
 					"response": []
 				},
 				{
-					"name": "update form setting",
+					"name": "update form quiz setting",
 					"request": {
 						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"raw": "{\n    \"viewMissedQuestions\":true,\n    \"defaultPointValue\":20\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -398,31 +416,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
+							"raw": "{{url}}/{{version}}/forms/:id/quizSettings",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":form_id",
-								"settings",
-								":id"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "quiz"
-								}
+								":id",
+								"quizSettings"
 							],
 							"variable": [
 								{
-									"key": "form_id",
-									"value": null
-								},
-								{
 									"key": "id",
-									"value": null
+									"value": "1"
 								}
 							]
 						}
@@ -430,62 +437,39 @@
 					"response": []
 				},
 				{
-					"name": "get form setting",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\":\"New form title\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"settings",
-								":id"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "quiz"
-								}
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete form setting",
+					"name": "delete form quiz setting",
 					"request": {
 						"method": "DELETE",
 						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/quizSettings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"quizSettings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update form response setting",
+					"request": {
+						"method": "PATCH",
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\":\"New form title\"\n}",
+							"raw": "{\n    \"allQuestionsRequired\":true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -493,31 +477,133 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/settings/:id?type=quiz",
+							"raw": "{{url}}/{{version}}/forms/:id/responseSettings",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":form_id",
-								"settings",
-								":id"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "quiz"
-								}
+								":id",
+								"responseSettings"
 							],
 							"variable": [
 								{
-									"key": "form_id",
-									"value": null
-								},
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update form presentation setting",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"showProgressBar\":true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/presentationSettings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"presentationSettings"
+							],
+							"variable": [
 								{
 									"key": "id",
-									"value": null
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get form quiz setting",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/quizSettings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"quizSettings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get form response setting",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/responseSettings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"responseSettings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get form presentation setting",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:id/presentationSettings",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":id",
+								"presentationSettings"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
 								}
 							]
 						}
