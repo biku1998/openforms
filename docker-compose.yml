@@ -24,7 +24,21 @@ services:
     env_file:
       - .env
     ports:
-      - '${PORT}:${PORT}'
+      - '${PORT_API}:${PORT_API}'
     depends_on:
       - database
       - redis
+
+  frontend:
+    container_name: openforms-frontend
+    image: biku1998/openforms-frontend
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - backend

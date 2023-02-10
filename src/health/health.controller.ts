@@ -32,7 +32,7 @@ export class HealthController {
       () =>
         this.httpHealthIndicator.pingCheck(
           'basic running check',
-          `http://localhost:${this.configService.get('PORT')}`,
+          `http://localhost:${this.configService.get('PORT_API')}`,
         ),
       () =>
         this.disk.checkStorage('disk health', {
