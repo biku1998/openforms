@@ -1,7 +1,0 @@
-services:
-  database:
-    volumes:
-      - ./pgdata-test:/var/lib/postgresql/data
-
-  backend:
-    command: npm run test:watch

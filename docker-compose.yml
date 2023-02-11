@@ -1,33 +1,15 @@
 services:
-  database:
-    container_name: postgres
-    image: postgres:15
-    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
-
-  redis:
-    image: redis:7.0.5
-    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
-
   backend:
-    container_name: openforms-backend-api
-    image: biku1998/openforms-backend-api
+    container_name: openforms-backend
+    image: biku1998/openforms-backend
     restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
     build:
       dockerfile: Dockerfile
-      context: .
+      context: ./backend
     env_file:
-      - .env
+      - ./backend/.env
     ports:
-      - '${PORT_API}:${PORT_API}'
-    depends_on:
-      - database
-      - redis
+      - '${PORT:-3001}:${PORT:-3001}'
 
   frontend:
     container_name: openforms-frontend
@@ -37,8 +19,6 @@ services:
       dockerfile: Dockerfile
       context: ./frontend
     env_file:
-      - .env
+      - ./frontend/.env
     ports:
-      - '${PORT}:${PORT}'
-    depends_on:
-      - backend
+      - '${PORT:-3000}:${PORT:-3000}'
