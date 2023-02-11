@@ -1,4 +1,4 @@
-#[openforms](https://openforms.in)
+# [openforms](https://openforms.in)
 
 
 ✨ openforms is a standalone, self-hosted data collection platform
