@@ -1,4 +1,4 @@
-import { ChoiceType, FileType } from '@prisma/client';
+import { ChoiceType, FileType, InfoType } from '@prisma/client';
 import {
   IsEnum,
   IsNotEmpty,
@@ -41,4 +41,11 @@ export class CreateQuestionDto {
   @IsOptional()
   @IsEnum(FileType, { each: true })
   readonly acceptedFileTypes?: FileType[];
+
+  // InfoQuestion attributes
+  @ValidateIf((obj) => obj.type === QuestionType.INFO)
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(InfoType)
+  readonly infoType: InfoType;
 }

@@ -29,6 +29,138 @@ export class QuestionsService {
     private readonly formsService: FormsService,
   ) {}
 
+  async getQuestions(formId: number): Promise<Question[]> {
+    // check if the forms exists
+    await this.formsService.getFormById(formId);
+
+    // get links
+    const formQuestions = await this.prismaService.formQuestion.findMany({
+      where: {
+        formId,
+      },
+    });
+
+    console.log(formQuestions);
+
+    if (formQuestions.length === 0) return [];
+
+    const questions: Question[] = [];
+
+    // prepare ids array for each type of question to save db calls
+    const questionTypeIds: { [type in QuestionType]?: number[] } = {};
+
+    formQuestions.forEach((formQuestion) => {
+      if (questionTypeIds[formQuestion.questionType]) {
+        questionTypeIds[formQuestion.questionType].push(
+          formQuestion.questionId,
+        );
+      } else {
+        questionTypeIds[formQuestion.questionType] = [formQuestion.questionId];
+      }
+    });
+
+    console.log(questionTypeIds);
+
+    Object.keys(questionTypeIds).forEach(async (questionType) => {
+      switch (questionType) {
+        case QuestionType.CHOICE: {
+          const choiceQuestions =
+            await this.prismaService.choiceQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+              },
+            });
+
+          choiceQuestions.forEach((cq) =>
+            questions.push({ ...cq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.DATE: {
+          const dateQuestions = await this.prismaService.dateQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+            },
+          });
+
+          dateQuestions.forEach((dq) =>
+            questions.push({ ...dq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.FILE_UPLOAD: {
+          const fileUploadQuestions =
+            await this.prismaService.fileUploadQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+              },
+            });
+
+          fileUploadQuestions.forEach((fuq) =>
+            questions.push({ ...fuq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.INFO: {
+          const infoQuestions = await this.prismaService.infoQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+            },
+          });
+
+          infoQuestions.forEach((iq) =>
+            questions.push({ ...iq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.NPS: {
+          const npsQuestions = await this.prismaService.npsQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+            },
+          });
+
+          npsQuestions.forEach((npq) =>
+            questions.push({ ...npq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.RATING: {
+          const ratingQuestions =
+            await this.prismaService.ratingQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+              },
+            });
+
+          ratingQuestions.forEach((rq) =>
+            questions.push({ ...rq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.TEXT: {
+          const textQuestions = await this.prismaService.textQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+            },
+          });
+
+          textQuestions.forEach((tq) =>
+            questions.push({ ...tq, type: questionType }),
+          );
+          break;
+        }
+      }
+    });
+    return questions;
+  }
+
   async getQuestionById(params: {
     id: number;
     questionType: QuestionType;

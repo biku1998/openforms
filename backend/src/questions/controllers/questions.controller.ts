@@ -38,7 +38,15 @@ export class QuestionsController {
     )
     formId: number,
   ) {
-    return [];
+    try {
+      const questions = await this.questionsService.getQuestions(formId);
+      return questions;
+    } catch (error) {
+      if (error instanceof FormNotFoundException) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
   }
 
   @Post()
