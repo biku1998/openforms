@@ -2,10 +2,23 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
+import { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL}/_health` as any);
+      const json = await resp.json();
+      console.log(json);
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  },[])
   return (
     <>
       <Head>

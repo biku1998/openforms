@@ -177,6 +177,23 @@ export class FormsService {
     return form;
   }
 
+  async getFormByIdAndCreator(params: {
+    id: number;
+    creatorId: number;
+  }): Promise<Form> {
+    const { id, creatorId } = params;
+    const form = await this.prismaService.form.findFirst({
+      where: {
+        id,
+        createdById: creatorId,
+      },
+    });
+    if (!form) throw new FormNotFoundException(id);
+
+    if (form.isActive === false) throw new ArchivedFormException(id);
+    return form;
+  }
+
   async updateForm(params: {
     where: Prisma.FormWhereUniqueInput;
     data: Prisma.FormUpdateInput;

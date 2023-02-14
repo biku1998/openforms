@@ -9,9 +9,11 @@ import {
   Body,
   Patch,
   Get,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { FormNotFoundException } from 'src/forms/exceptions';
-import { UserSession } from 'src/utils/types';
+import { ItemState, UserSession } from 'src/utils/types';
 import { CreateQuestionDto } from '../dtos';
 import { UpdateQuestionDto } from '../dtos/update-question.dto';
 import {
@@ -37,9 +39,14 @@ export class QuestionsController {
       }),
     )
     formId: number,
+    @Query('state', new DefaultValuePipe(ItemState.active)) state?: string,
   ) {
     try {
-      const questions = await this.questionsService.getQuestions(formId);
+      const questions = await this.questionsService.getQuestions({
+        formId,
+        userId: session.user.id,
+        isActive: state === ItemState.active,
+      });
       return questions;
     } catch (error) {
       if (error instanceof FormNotFoundException) {
@@ -112,6 +119,7 @@ export class QuestionsController {
       const question = await this.questionsService.updateQuestion({
         formId,
         id,
+        userId: session.user.id,
         data: {
           ...updateQuestionDto,
           lastUpdatedByUser: {

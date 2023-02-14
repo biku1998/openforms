@@ -29,9 +29,17 @@ export class QuestionsService {
     private readonly formsService: FormsService,
   ) {}
 
-  async getQuestions(formId: number): Promise<Question[]> {
+  async getQuestions(params: {
+    formId: number;
+    userId: number;
+    isActive: boolean;
+  }): Promise<Question[]> {
+    const { formId, userId, isActive } = params;
     // check if the forms exists
-    await this.formsService.getFormById(formId);
+    await this.formsService.getFormByIdAndCreator({
+      id: formId,
+      creatorId: userId,
+    });
 
     // get links
     const formQuestions = await this.prismaService.formQuestion.findMany({
@@ -39,8 +47,6 @@ export class QuestionsService {
         formId,
       },
     });
-
-    console.log(formQuestions);
 
     if (formQuestions.length === 0) return [];
 
@@ -59,15 +65,15 @@ export class QuestionsService {
       }
     });
 
-    console.log(questionTypeIds);
-
-    Object.keys(questionTypeIds).forEach(async (questionType) => {
+    for (const questionType of Object.keys(questionTypeIds)) {
       switch (questionType) {
         case QuestionType.CHOICE: {
           const choiceQuestions =
             await this.prismaService.choiceQuestion.findMany({
               where: {
                 id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
               },
             });
 
@@ -81,6 +87,8 @@ export class QuestionsService {
           const dateQuestions = await this.prismaService.dateQuestion.findMany({
             where: {
               id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
             },
           });
 
@@ -95,6 +103,8 @@ export class QuestionsService {
             await this.prismaService.fileUploadQuestion.findMany({
               where: {
                 id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
               },
             });
 
@@ -108,6 +118,8 @@ export class QuestionsService {
           const infoQuestions = await this.prismaService.infoQuestion.findMany({
             where: {
               id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
             },
           });
 
@@ -121,6 +133,8 @@ export class QuestionsService {
           const npsQuestions = await this.prismaService.npsQuestion.findMany({
             where: {
               id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
             },
           });
 
@@ -135,6 +149,8 @@ export class QuestionsService {
             await this.prismaService.ratingQuestion.findMany({
               where: {
                 id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
               },
             });
 
@@ -148,6 +164,8 @@ export class QuestionsService {
           const textQuestions = await this.prismaService.textQuestion.findMany({
             where: {
               id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
             },
           });
 
@@ -157,75 +175,83 @@ export class QuestionsService {
           break;
         }
       }
-    });
+    }
     return questions;
   }
 
-  async getQuestionById(params: {
+  async getQuestionByIdAndCreator(params: {
     id: number;
     questionType: QuestionType;
+    creatorId: number;
   }): Promise<Question> {
-    const { id, questionType } = params;
+    const { id, questionType, creatorId } = params;
     let resp: any;
     switch (questionType) {
       case QuestionType.CHOICE: {
-        resp = await this.prismaService.choiceQuestion.findUnique({
+        resp = await this.prismaService.choiceQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.DATE: {
-        resp = await this.prismaService.dateQuestion.findUnique({
+        resp = await this.prismaService.dateQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.FILE_UPLOAD: {
-        resp = await this.prismaService.fileUploadQuestion.findUnique({
+        resp = await this.prismaService.fileUploadQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.TEXT: {
-        resp = await this.prismaService.textQuestion.findUnique({
+        resp = await this.prismaService.textQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.NPS: {
-        resp = await this.prismaService.npsQuestion.findUnique({
+        resp = await this.prismaService.npsQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.RATING: {
-        resp = await this.prismaService.ratingQuestion.findUnique({
+        resp = await this.prismaService.ratingQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
         break;
       }
       case QuestionType.INFO: {
-        resp = await this.prismaService.infoQuestion.findUnique({
+        resp = await this.prismaService.infoQuestion.findFirst({
           where: {
             id,
+            createdById: creatorId,
           },
         });
 
@@ -239,13 +265,15 @@ export class QuestionsService {
   async isQuestionLinkedToForm(params: {
     formId: number;
     questionId: number;
+    questionType: QuestionType;
   }): Promise<boolean> {
-    const { formId, questionId } = params;
+    const { formId, questionId, questionType } = params;
     const resp = await this.prismaService.formQuestion.findUnique({
       where: {
-        formId_questionId: {
+        formId_questionId_questionType: {
           formId,
           questionId,
+          questionType,
         },
       },
     });
@@ -381,22 +409,30 @@ export class QuestionsService {
     id: number;
     formId: number;
     data: QuestionUpdateInput;
+    userId: number;
   }): Promise<Question> {
     try {
-      const { data, formId, id } = params;
-      // check if the form exits
-      await this.formsService.getFormById(formId);
+      const { data, formId, id, userId } = params;
+      // check if the forms exists
+      await this.formsService.getFormByIdAndCreator({
+        id: formId,
+        creatorId: userId,
+      });
 
       // check if question exists
-      await this.getQuestionById({
+      await this.getQuestionByIdAndCreator({
         id,
         questionType: data.type,
+        creatorId: userId,
       });
 
       // check if this question is linked to this form or not
       if (
-        (await this.isQuestionLinkedToForm({ formId, questionId: id })) ===
-        false
+        (await this.isQuestionLinkedToForm({
+          formId,
+          questionId: id,
+          questionType: data.type,
+        })) === false
       )
         throw new FormQuestionLinkNotFoundException({
           formId,
