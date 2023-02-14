@@ -27,10 +27,15 @@ Coming soon...
 
 ### Development workflow
 
-- make sure you have `docker` up and running
+- make sure you have `docker` and `node` up and running
 - clone the repo
 ```sh
 git clone git@github.com:biku1998/openforms.git
+```
+- install deps for both frontend and backend
+```sh
+cd ./frontend && npm i
+cd ./backend && npm i
 ```
 - copy compose override file
 ```sh
