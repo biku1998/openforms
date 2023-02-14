@@ -1,7 +1,7 @@
 {
-  "name": "server-api",
+  "name": "openforms-backend",
   "version": "0.0.1",
-  "description": "backend api for openforms.in",
+  "description": "backend api for openforms",
   "author": "https://github.com/biku1998",
   "private": true,
   "license": "UNLICENSED",

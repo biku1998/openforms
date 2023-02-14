@@ -34,8 +34,8 @@ git clone git@github.com:biku1998/openforms.git
 ```
 - install deps for both frontend and backend
 ```sh
-cd ./frontend && npm i
-cd ./backend && npm i
+npm --prefix ./frontend i
+npm --prefix ./backend i
 ```
 - copy compose override file
 ```sh
