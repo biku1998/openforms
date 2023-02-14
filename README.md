@@ -39,8 +39,6 @@ cp docker-compose.override.yml.example docker-compose.override.yml
 - copy .env files
 ```sh
 cp .env.example .env
-cp ./frontend/.env.example ./frontend/.env
-cp ./backend/.env.example ./backend/.env
 ```
 - run docker compose
 ```sh

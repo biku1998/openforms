@@ -2,24 +2,23 @@ FROM node:16
 
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  # Allow install without lockfile, so example works even without Node.js installed locally
-  else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
-  fi
+ENV NODE_ENV=development
 
+COPY package*.json .
+
+# Install dependencies based on the preferred package manager
+RUN npm ci
+
+COPY . .
 # copy required files
-COPY src ./src
-COPY prisma ./prisma
-COPY test ./test
-COPY tsconfig.json .
-COPY tsconfig.build.json .
-COPY nest-cli.json .
-COPY .env .
+# COPY src ./src
+# COPY prisma ./prisma
+# COPY test ./test
+# COPY tsconfig.json .
+# COPY tsconfig.build.json .
+# COPY nest-cli.json .
+# COPY .env .
+
 
 # generate prisma client
 RUN npm run prisma:generate

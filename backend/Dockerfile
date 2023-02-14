@@ -37,6 +37,9 @@ FROM node:16 As runner
 
 WORKDIR /app
 
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
 USER nestjs

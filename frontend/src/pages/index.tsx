@@ -59,6 +59,8 @@ export default function Home() {
               priority
             />
           </div>
+          <h1>Docker compose example</h1>
+          <p>seems like hot reloading is working fine</p>
         </div>
 
         <div className={styles.grid}>

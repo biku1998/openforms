@@ -6,10 +6,15 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./backend
-    env_file:
-      - ./backend/.env
+    environment:
+      - PORT=${BACKEND_PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SIGN_SECRET=${SESSION_SIGN_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_URL=${REDIS_URL}
     ports:
-      - '${PORT:-3001}:${PORT:-3001}'
+      - ${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}
 
   frontend:
     container_name: openforms-frontend
@@ -18,7 +23,9 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./frontend
-    env_file:
-      - ./frontend/.env
+    environment:
+      - PORT=${FRONTEND_PORT}
     ports:
-      - '${PORT:-3000}:${PORT:-3000}'
+      - ${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}
+    depends_on:
+      - backend
