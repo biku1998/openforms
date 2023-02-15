@@ -7,11 +7,14 @@ import { FormNotFoundException } from 'src/forms/exceptions';
 import { FormsService } from 'src/forms/services';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
+import { QuestionArchivedEvent } from '../events/question-archived.event';
 import { QuestionCreatedEvent } from '../events/question-created.event';
+import { QuestionDeletedEvent } from '../events/question-deleted.event';
+import { QuestionRestoredEvent } from '../events/question-restored.event';
 import { QuestionUpdatedEvent } from '../events/question-updated.event';
 import {
   DuplicateFormQuestionException,
-  FormQuestionLinkNotFoundException,
+  FormQuestionNotFoundException,
   QuestionNotFoundException,
 } from '../exceptions';
 import {
@@ -262,13 +265,13 @@ export class QuestionsService {
     return { ...resp, type: questionType };
   }
 
-  async isQuestionLinkedToForm(params: {
+  async getFormQuestion(params: {
     formId: number;
     questionId: number;
     questionType: QuestionType;
-  }): Promise<boolean> {
+  }): Promise<FormQuestion> {
     const { formId, questionId, questionType } = params;
-    const resp = await this.prismaService.formQuestion.findUnique({
+    const formQuestion = await this.prismaService.formQuestion.findUnique({
       where: {
         formId_questionId_questionType: {
           formId,
@@ -277,10 +280,18 @@ export class QuestionsService {
         },
       },
     });
-    return Boolean(resp);
+
+    if (!formQuestion)
+      throw new FormQuestionNotFoundException({
+        formId,
+        questionId,
+        questionType,
+      });
+
+    return formQuestion;
   }
 
-  async linkQuestionToForm(params: {
+  async createFormQuestion(params: {
     formId: number;
     questionId: number;
     position?: number;
@@ -307,8 +318,12 @@ export class QuestionsService {
           throw new FormNotFoundException(params.formId);
         }
         if (error.code === PrismaErrorCode.UNIQUE_CONSTRAINT_VIOLATION) {
-          const { formId, questionId } = params;
-          throw new DuplicateFormQuestionException({ formId, questionId });
+          const { formId, questionId, questionType } = params;
+          throw new DuplicateFormQuestionException({
+            formId,
+            questionId,
+            questionType,
+          });
         }
       }
     }
@@ -377,7 +392,7 @@ export class QuestionsService {
       }
 
       // add question to form
-      await this.linkQuestionToForm({
+      await this.createFormQuestion({
         formId,
         questionId: question.id,
         questionType: data.type,
@@ -427,17 +442,11 @@ export class QuestionsService {
       });
 
       // check if this question is linked to this form or not
-      if (
-        (await this.isQuestionLinkedToForm({
-          formId,
-          questionId: id,
-          questionType: data.type,
-        })) === false
-      )
-        throw new FormQuestionLinkNotFoundException({
-          formId,
-          questionId: id,
-        });
+      await this.getFormQuestion({
+        formId,
+        questionId: id,
+        questionType: data.type,
+      });
 
       let question: Question;
       switch (data.type) {
@@ -530,6 +539,352 @@ export class QuestionsService {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
           console.log(error);
           throw new FormNotFoundException(params.formId);
+        }
+      }
+      throw error;
+    }
+  }
+
+  async archiveQuestion(params: {
+    formId: number;
+    id: number;
+    userId: number;
+    questionType: QuestionType;
+  }): Promise<Question> {
+    try {
+      const { formId, id, userId, questionType } = params;
+      // check if the form exists and creator matches
+      await this.formsService.getFormByIdAndCreator({
+        id: formId,
+        creatorId: userId,
+      });
+      // check if the question is linked to the form or not
+      await this.getFormQuestion({
+        questionId: id,
+        formId,
+        questionType,
+      });
+
+      const data = {
+        isActive: false,
+      };
+      // archive the question
+      let question: Question;
+      switch (questionType) {
+        case QuestionType.CHOICE: {
+          const resp = await this.prismaService.choiceQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.CHOICE };
+          break;
+        }
+        case QuestionType.DATE: {
+          const resp = await this.prismaService.dateQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.DATE };
+          break;
+        }
+        case QuestionType.FILE_UPLOAD: {
+          const resp = await this.prismaService.fileUploadQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.FILE_UPLOAD };
+          break;
+        }
+        case QuestionType.TEXT: {
+          const resp = await this.prismaService.textQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.TEXT };
+          break;
+        }
+        case QuestionType.NPS: {
+          const resp = await this.prismaService.npsQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.NPS };
+          break;
+        }
+        case QuestionType.RATING: {
+          const resp = await this.prismaService.ratingQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.RATING };
+          break;
+        }
+        case QuestionType.INFO: {
+          const resp = await this.prismaService.infoQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.INFO };
+          break;
+        }
+      }
+
+      // fire events
+      this.eventEmitter.emit(
+        AppEventType.QUESTION_ARCHIVED,
+        new QuestionArchivedEvent({
+          id: question.id,
+          userId: question.createdById,
+          formId,
+        }),
+      );
+
+      return question;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async restoreQuestion(params: {
+    formId: number;
+    id: number;
+    userId: number;
+    questionType: QuestionType;
+  }): Promise<Question> {
+    try {
+      const { formId, id, userId, questionType } = params;
+      // check if the form exists and creator matches
+      await this.formsService.getFormByIdAndCreator({
+        id: formId,
+        creatorId: userId,
+      });
+      // check if the question is linked to the form or not
+      await this.getFormQuestion({
+        questionId: id,
+        formId,
+        questionType,
+      });
+
+      const data = {
+        isActive: true,
+      };
+      // archive the question
+      let question: Question;
+      switch (questionType) {
+        case QuestionType.CHOICE: {
+          const resp = await this.prismaService.choiceQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.CHOICE };
+          break;
+        }
+        case QuestionType.DATE: {
+          const resp = await this.prismaService.dateQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.DATE };
+          break;
+        }
+        case QuestionType.FILE_UPLOAD: {
+          const resp = await this.prismaService.fileUploadQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.FILE_UPLOAD };
+          break;
+        }
+        case QuestionType.TEXT: {
+          const resp = await this.prismaService.textQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.TEXT };
+          break;
+        }
+        case QuestionType.NPS: {
+          const resp = await this.prismaService.npsQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.NPS };
+          break;
+        }
+        case QuestionType.RATING: {
+          const resp = await this.prismaService.ratingQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.RATING };
+          break;
+        }
+        case QuestionType.INFO: {
+          const resp = await this.prismaService.infoQuestion.update({
+            data: _omit(data, ['type']),
+            where: {
+              id,
+            },
+          });
+          question = { ...resp, type: QuestionType.INFO };
+          break;
+        }
+      }
+
+      // fire events
+      this.eventEmitter.emit(
+        AppEventType.QUESTION_RESTORED,
+        new QuestionRestoredEvent({
+          id: question.id,
+          userId: question.createdById,
+          formId,
+        }),
+      );
+
+      return question;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteQuestion(params: {
+    formId: number;
+    id: number;
+    userId: number;
+    questionType: QuestionType;
+  }): Promise<boolean> {
+    try {
+      const { formId, id, userId, questionType } = params;
+      // check if the form exists and creator matches
+      await this.formsService.getFormByIdAndCreator({
+        id: formId,
+        creatorId: userId,
+      });
+      // check if the question is linked to the form or not
+      await this.getFormQuestion({
+        questionId: id,
+        formId,
+        questionType,
+      });
+
+      switch (questionType) {
+        case QuestionType.CHOICE: {
+          await this.prismaService.choiceQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.DATE: {
+          await this.prismaService.dateQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.FILE_UPLOAD: {
+          await this.prismaService.fileUploadQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.TEXT: {
+          await this.prismaService.textQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.NPS: {
+          await this.prismaService.npsQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.RATING: {
+          await this.prismaService.ratingQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+        case QuestionType.INFO: {
+          await this.prismaService.infoQuestion.deleteMany({
+            where: {
+              id,
+              createdById: userId,
+            },
+          });
+          break;
+        }
+      }
+
+      // delete the formQuestion as well
+      await this.prismaService.formQuestion.delete({
+        where: {
+          formId_questionId_questionType: {
+            formId,
+            questionId: id,
+            questionType,
+          },
+        },
+      });
+
+      // fire events
+      this.eventEmitter.emit(
+        AppEventType.QUESTION_DELETED,
+        new QuestionDeletedEvent({
+          id,
+          userId,
+          formId,
+        }),
+      );
+
+      return true;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
+          throw new QuestionNotFoundException(params.id);
         }
       }
       throw error;
