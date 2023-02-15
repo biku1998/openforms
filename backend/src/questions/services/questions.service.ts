@@ -7,11 +7,14 @@ import { FormNotFoundException } from 'src/forms/exceptions';
 import { FormsService } from 'src/forms/services';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
-import { QuestionArchivedEvent } from '../events/question-archived.event';
-import { QuestionCreatedEvent } from '../events/question-created.event';
-import { QuestionDeletedEvent } from '../events/question-deleted.event';
-import { QuestionRestoredEvent } from '../events/question-restored.event';
-import { QuestionUpdatedEvent } from '../events/question-updated.event';
+import {
+  QuestionArchivedEvent,
+  QuestionCreatedEvent,
+  QuestionDeletedEvent,
+  QuestionUpdatedEvent,
+  QuestionRestoredEvent,
+} from '../events';
+
 import {
   DuplicateFormQuestionException,
   FormQuestionNotFoundException,

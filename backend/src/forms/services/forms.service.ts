@@ -21,6 +21,29 @@ export class FormsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  async getForm(params: {
+    id: number;
+    userId?: number;
+    title?: string;
+  }): Promise<Form> {
+    const { id, userId, title } = params;
+    if (userId || title) {
+      const form = await this.prismaService.form.findFirst({
+        where: {
+          id,
+          createdById: userId,
+          title,
+        },
+      });
+      if (!form) throw new FormNotFoundException(id);
+      return form;
+    }
+
+    const form = await this.prismaService.form.findUnique({ where: { id } });
+    if (!form) if (!form) throw new FormNotFoundException(id);
+    return form;
+  }
+
   async createForm({ data }: { data: Prisma.FormCreateInput }): Promise<Form> {
     const form = await this.prismaService.form.create({
       data,
