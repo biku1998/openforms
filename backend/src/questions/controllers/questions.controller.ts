@@ -172,7 +172,7 @@ export class QuestionsController {
       new ParseEnumPipe(QuestionType, {
         exceptionFactory: () => {
           throw new BadRequestException(
-            `question type is required and must be one of [${Object.keys(
+            `questionType query param is required and must be one of [${Object.keys(
               QuestionType,
             ).join(', ')}] these`,
           );
@@ -229,7 +229,7 @@ export class QuestionsController {
       new ParseEnumPipe(QuestionType, {
         exceptionFactory: () => {
           throw new BadRequestException(
-            `question type is required and must be one of [${Object.keys(
+            `questionType query param is required and must be one of [${Object.keys(
               QuestionType,
             ).join(', ')}] these`,
           );
@@ -286,7 +286,7 @@ export class QuestionsController {
       new ParseEnumPipe(QuestionType, {
         exceptionFactory: () => {
           throw new BadRequestException(
-            `question type is required and must be one of [${Object.keys(
+            `questionType query param is required and must be one of [${Object.keys(
               QuestionType,
             ).join(', ')}] these`,
           );

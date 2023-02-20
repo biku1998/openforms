@@ -6,3 +6,5 @@ export * from './question-created.event';
 export * from './question-deleted.event';
 export * from './question-restored.event';
 export * from './question-updated.event';
+export * from './option-archived.event';
+export * from './option-restored.event';

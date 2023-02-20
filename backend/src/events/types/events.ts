@@ -28,4 +28,6 @@ export enum AppEventType {
   OPTION_CREATED = 'option.created',
   OPTION_UPDATED = 'option.updated',
   OPTION_DELETED = 'option.deleted',
+  OPTION_ARCHIVED = 'option.archived',
+  OPTION_RESTORED = 'option.restored',
 }
