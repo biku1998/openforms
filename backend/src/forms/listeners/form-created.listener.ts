@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppEventType } from 'src/events/types/events';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FormCreatedEvent } from '../events/form-created.event';
+import { FormCreatedEvent } from '../events';
 
 @Injectable()
 export class FormCreatedListener {

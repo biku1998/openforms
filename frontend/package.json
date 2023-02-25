@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+  "name": "openforms-frontend",
+  "description": "frontend for openforms",
   "version": "0.1.0",
   "private": true,
   "scripts": {

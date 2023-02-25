@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "a49d8b91-dac2-404b-abc7-505ce6cc5e86",
-		"name": "openforms.in",
+		"name": "openforms",
 		"description": "# Openforms.in\n\n---\n\n### Rest API docs",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13741737"
@@ -182,7 +182,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\":\"skill survey for data science program\",\n    \"description\":\"collecting understanding level of learners\"\n}",
+							"raw": "{\n    \"title\":\"skill survey for data science program\",\n    \"description\":\"understanding level of learners for the data science program\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -621,7 +621,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"raw": "{{url}}/{{version}}/forms/:id/questions?state=archived",
 							"host": [
 								"{{url}}"
 							],
@@ -631,10 +631,21 @@
 								":id",
 								"questions"
 							],
+							"query": [
+								{
+									"key": "state",
+									"value": "archived"
+								},
+								{
+									"key": "types",
+									"value": "mcq,chekcbox,dropdown",
+									"disabled": true
+								}
+							],
 							"variable": [
 								{
 									"key": "id",
-									"value": null
+									"value": "1"
 								}
 							]
 						}
@@ -646,21 +657,30 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"date question here\",\n    \"type\": \"DATE\",\n    \"infoType\":\"EMAIL\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"raw": "{{url}}/{{version}}/forms/:formId/questions",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":id",
+								":formId",
 								"questions"
 							],
 							"variable": [
 								{
-									"key": "id",
-									"value": null
+									"key": "formId",
+									"value": "1"
 								}
 							]
 						}
@@ -672,21 +692,35 @@
 					"request": {
 						"method": "PATCH",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ratingType\":\"HEART\",\n    \"type\":\"FILE_UPLOAD\",\n    \"content\":\"file question updated, this is good right?\",\n    \"acceptedFileTypes\":[\"PDF\",\"AUDIO\"],\n    \"high\":20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:id/questions",
+							"raw": "{{url}}/{{version}}/forms/:formId/questions/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":id",
-								"questions"
+								":formId",
+								"questions",
+								":id"
 							],
 							"variable": [
 								{
+									"key": "formId",
+									"value": "1"
+								},
+								{
 									"key": "id",
-									"value": null
+									"value": "1"
 								}
 							]
 						}
@@ -696,28 +730,73 @@
 				{
 					"name": "archive form question",
 					"request": {
-						"method": "PATCH",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id",
+							"raw": "{{url}}/{{version}}/forms/:formId/questions/:id/archive?type=FILE_UPLOAD",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":form_id",
+								":formId",
 								"questions",
-								":id"
+								":id",
+								"archive"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "FILE_UPLOAD"
+								}
 							],
 							"variable": [
 								{
-									"key": "form_id",
-									"value": null
+									"key": "formId",
+									"value": "1"
 								},
 								{
 									"key": "id",
-									"value": null
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restore archived question",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/forms/:formId/questions/:id/restore?type=FILE_UPLOAD",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"forms",
+								":formId",
+								"questions",
+								":id",
+								"restore"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "FILE_UPLOAD"
+								}
+							],
+							"variable": [
+								{
+									"key": "formId",
+									"value": "1"
+								},
+								{
+									"key": "id",
+									"value": "1"
 								}
 							]
 						}
@@ -730,264 +809,31 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id",
+							"raw": "{{url}}/{{version}}/forms/:formId/questions/:id?type=INFO",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"{{version}}",
 								"forms",
-								":form_id",
+								":formId",
 								"questions",
 								":id"
 							],
-							"variable": [
+							"query": [
 								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
+									"key": "type",
+									"value": "INFO"
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create choice question option",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/options",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":id",
-								"options"
 							],
 							"variable": [
 								{
-									"key": "form_id",
-									"value": null
+									"key": "formId",
+									"value": "1"
 								},
 								{
 									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update choice question option",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/options/:id",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":question_id",
-								"options",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "question_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get choice question options",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/options",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":id",
-								"options"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create question grading",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/gradings",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":id",
-								"gradings"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get question grading",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:id/gradings",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":id",
-								"gradings"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update question grading",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/gradings/:id",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":question_id",
-								"gradings",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "question_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete question grading",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/{{version}}/forms/:form_id/questions/:question_id/gradings/:id",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"{{version}}",
-								"forms",
-								":form_id",
-								"questions",
-								":question_id",
-								"gradings",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "form_id",
-									"value": null
-								},
-								{
-									"key": "question_id",
-									"value": null
-								},
-								{
-									"key": "id",
-									"value": null
+									"value": "1"
 								}
 							]
 						}
@@ -1390,6 +1236,20 @@
 					"path": [
 						"{{version}}",
 						"_health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "home",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}",
+					"host": [
+						"{{url}}"
 					]
 				}
 			},

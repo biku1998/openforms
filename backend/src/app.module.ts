@@ -1,6 +1,5 @@
-import { CacheModule, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { redisStore } from 'cache-manager-redis-store';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -19,23 +18,6 @@ import { QuestionsModule } from './questions/questions.module';
       envFilePath: '.env',
       isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
-    }),
-    CacheModule.registerAsync<any>({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        const store = redisStore({
-          socket: {
-            host: configService.get('REDIS_HOST'),
-            port: configService.get('REDIS_PORT'),
-          },
-          ttl: 60,
-        });
-        return {
-          store: () => store,
-        };
-      },
-      inject: [ConfigService],
     }),
     EventEmitterModule.forRoot({
       wildcard: true,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateUserDto } from '../dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +12,13 @@ export class UsersService {
       where: {
         email,
       },
+    });
+    return user;
+  }
+
+  async findById(id: number): Promise<User | null> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
     });
     return user;
   }

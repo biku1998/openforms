@@ -1,18 +1,9 @@
-import { Session } from 'express-session';
-
-export type UserSession = Session &
-  Record<
-    'user',
-    {
-      id: number;
-      email: string;
-      userAgent: string;
-      ipAddress: string;
-      lastLogin: string;
-    }
-  >;
+import { User } from '@prisma/client';
+import { Request } from 'express';
 
 export enum ItemState {
   archived = 'archived',
   active = 'active',
 }
+
+export type RequestWithUser = Request & Record<'user', User>;

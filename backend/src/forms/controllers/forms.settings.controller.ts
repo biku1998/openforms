@@ -9,9 +9,9 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Session as GetSession,
+  Req,
 } from '@nestjs/common';
-import { UserSession } from 'src/utils/types';
+import { RequestWithUser } from 'src/utils/types';
 import { FormQuizSettingDto } from '../dtos';
 import { FormPresentationSettingDto } from '../dtos/form-presentation-setting.dto';
 import { FormResponseSettingDto } from '../dtos/form-response-setting.dto';
@@ -30,7 +30,7 @@ export class FormsSettingsController {
 
   @Post('quizSettings')
   async createFormQuizSetting(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -54,7 +54,7 @@ export class FormsSettingsController {
             },
             createdByUser: {
               connect: {
-                id: session.user.id,
+                id: req.user.id,
               },
             },
           },
@@ -73,7 +73,7 @@ export class FormsSettingsController {
 
   @Patch('quizSettings')
   async updateFormQuizSetting(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -100,7 +100,7 @@ export class FormsSettingsController {
             },
             lastUpdatedByUser: {
               connect: {
-                id: session.user.id,
+                id: req.user.id,
               },
             },
           },
@@ -116,7 +116,7 @@ export class FormsSettingsController {
 
   @Delete('quizSettings')
   async deleteFormQuizSetting(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -133,7 +133,7 @@ export class FormsSettingsController {
           where: {
             formId: id,
           },
-          userId: session.user.id,
+          userId: req.user.id,
         });
       return formQuizSetting;
     } catch (error) {
@@ -146,7 +146,7 @@ export class FormsSettingsController {
 
   @Patch('presentationSettings')
   async updateFormPresentationSetting(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -168,7 +168,7 @@ export class FormsSettingsController {
             ...formPresentationSettingDto,
             lastUpdatedByUser: {
               connect: {
-                id: session.user.id,
+                id: req.user.id,
               },
             },
           },
@@ -184,7 +184,7 @@ export class FormsSettingsController {
 
   @Patch('responseSettings')
   async updateFormResponseSetting(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -206,7 +206,7 @@ export class FormsSettingsController {
             ...formResponseSettingDto,
             lastUpdatedByUser: {
               connect: {
-                id: session.user.id,
+                id: req.user.id,
               },
             },
           },

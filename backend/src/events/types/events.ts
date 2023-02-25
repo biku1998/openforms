@@ -23,4 +23,11 @@ export enum AppEventType {
   QUESTION_ARCHIVED = 'question.archived',
   QUESTION_RESTORED = 'question.restored',
   QUESTION_DELETED = 'question.deleted',
+
+  // options
+  OPTION_CREATED = 'option.created',
+  OPTION_UPDATED = 'option.updated',
+  OPTION_DELETED = 'option.deleted',
+  OPTION_ARCHIVED = 'option.archived',
+  OPTION_RESTORED = 'option.restored',
 }

@@ -21,12 +21,37 @@ Visit [openforms.in](https://openforms.in) for more info. Check out the [**live 
 
 > NOTE : the tools will keep evolving as we move forward.
 
-## Setup local development workflow
+### Production installation workflow
 
-- make sure you have `docker` up and running
+Coming soon...
+
+### Development workflow
+
+- make sure you have `docker` and `node >= 16.6.0` up and running
 - clone the repo
-- copy `docker-compose.override.yml.example` content to `docker-compose.override.yml`
-- run `docker-compose up -d`
+```sh
+git clone git@github.com:biku1998/openforms.git
+```
+- install deps for both frontend and backend
+```sh
+cd ./frontend && npm ci
+cd ./backend && npm ci
+```
+- copy compose override file
+```sh
+cp docker-compose.override.yml.example docker-compose.override.yml
+```
+- copy .env files
+```sh
+cp .env.example .env
+```
+- run docker compose
+```sh
+docker compose up -d
+
+# run below if you face any issues from the above command
+docker compose up --build --force-recreate
+```
 
 That's it ✨
 

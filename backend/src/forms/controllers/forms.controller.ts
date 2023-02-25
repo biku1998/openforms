@@ -11,10 +11,10 @@ import {
   Patch,
   Post,
   Query,
-  Session as GetSession,
+  Req,
 } from '@nestjs/common';
 import { Form as FormModel } from '@prisma/client';
-import { ItemState, UserSession } from 'src/utils/types';
+import { ItemState, RequestWithUser } from 'src/utils/types';
 import { CreateFormDto, UpdateFormDto } from '../dtos';
 import { FormNotFoundException } from '../exceptions';
 import { FormsService } from '../services';
@@ -28,7 +28,7 @@ export class FormsController {
 
   @Get()
   async getForms(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Query('state', new DefaultValuePipe(ItemState.active)) state?: string,
     @Query('searchString') searchString?: string,
     @Query('sort') sort?: string,
@@ -67,7 +67,7 @@ export class FormsController {
 
       const forms = await this.formService.getForms({
         where: {
-          createdById: session.user.id,
+          createdById: req.user.id,
           isActive: state === 'active',
           ...or,
         },
@@ -81,7 +81,7 @@ export class FormsController {
 
   @Patch(':id')
   async updateForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -102,7 +102,7 @@ export class FormsController {
           ...updateFormDto,
           lastUpdatedByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
         },
@@ -118,7 +118,7 @@ export class FormsController {
 
   @Post()
   async createForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Body() createFormDto: CreateFormDto,
   ): Promise<FormModel> {
     try {
@@ -127,7 +127,7 @@ export class FormsController {
           ...createFormDto,
           createdByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
         },
@@ -141,7 +141,7 @@ export class FormsController {
 
   @Delete(':id/archive')
   async archiveForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -157,7 +157,7 @@ export class FormsController {
         where: {
           id,
         },
-        userId: session.user.id,
+        userId: req.user.id,
       });
     } catch (error) {
       if (error instanceof FormNotFoundException) {
@@ -169,7 +169,7 @@ export class FormsController {
 
   @Patch(':id/publish')
   async publishForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -183,7 +183,7 @@ export class FormsController {
     try {
       await this.formService.publishForm({
         where: { id },
-        userId: session.user.id,
+        userId: req.user.id,
       });
     } catch (error) {
       if (error instanceof FormNotFoundException) {
@@ -195,7 +195,7 @@ export class FormsController {
 
   @Delete(':id/publish')
   async unPublishForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -211,7 +211,7 @@ export class FormsController {
         where: {
           id,
         },
-        userId: session.user.id,
+        userId: req.user.id,
       });
     } catch (error) {
       if (error instanceof FormNotFoundException) {
@@ -223,7 +223,7 @@ export class FormsController {
 
   @Patch(':id/restore')
   async restoreForm(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'id',
       new ParseIntPipe({
@@ -239,7 +239,7 @@ export class FormsController {
         where: {
           id,
         },
-        userId: session.user.id,
+        userId: req.user.id,
       });
     } catch (error) {
       if (error instanceof FormNotFoundException) {

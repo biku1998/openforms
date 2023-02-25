@@ -1,19 +1,49 @@
-export class InvalidFormQuestionLinkException extends Error {
-  constructor({ formId, questionId }: { formId: number; questionId: number }) {
+import { QuestionType } from '../types/question';
+
+export class InvalidFormQuestionException extends Error {
+  constructor({
+    formId,
+    questionId,
+    questionType,
+  }: {
+    formId: number;
+    questionId: number;
+    questionType: QuestionType;
+  }) {
     super(
-      `Question ${questionId} cannot be linked to form ${formId}. Already linked to some other form`,
+      `Question ${questionId} of type ${questionType} cannot be added to form ${formId}. Already added in some other form`,
     );
   }
 }
 
-export class FormQuestionLinkNotFoundException extends Error {
-  constructor({ formId, questionId }: { formId: number; questionId: number }) {
-    super(`Question ${questionId} is not linked to form ${formId}`);
+export class FormQuestionNotFoundException extends Error {
+  constructor({
+    formId,
+    questionId,
+    questionType,
+  }: {
+    formId: number;
+    questionId: number;
+    questionType: QuestionType;
+  }) {
+    super(
+      `Question ${questionId} of type ${questionType} is not present in form ${formId}`,
+    );
   }
 }
 
 export class DuplicateFormQuestionException extends Error {
-  constructor({ formId, questionId }: { formId: number; questionId: number }) {
-    super(`Question ${questionId} already linked to form ${formId}`);
+  constructor({
+    formId,
+    questionId,
+    questionType,
+  }: {
+    formId: number;
+    questionId: number;
+    questionType: QuestionType;
+  }) {
+    super(
+      `Question ${questionId} of type ${questionType} is already present in form ${formId}`,
+    );
   }
 }
