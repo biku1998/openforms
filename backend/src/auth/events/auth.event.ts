@@ -6,6 +6,7 @@ type UserSignedUpEventPayload = {
   payload: Prisma.UserCreateInput;
   userId: number;
 };
+
 export class UserSignedUpEvent extends BaseEvent {
   private readonly payload: UserSignedUpEventPayload;
   constructor(payload: UserSignedUpEventPayload) {

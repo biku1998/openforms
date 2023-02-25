@@ -1,6 +1,5 @@
 import {
   Controller,
-  Session as GetSession,
   Param,
   Post,
   ParseIntPipe,
@@ -13,9 +12,10 @@ import {
   DefaultValuePipe,
   Delete,
   ParseEnumPipe,
+  Req,
 } from '@nestjs/common';
 import { FormNotFoundException } from 'src/forms/exceptions';
-import { ItemState, UserSession } from 'src/utils/types';
+import { ItemState, RequestWithUser } from 'src/utils/types';
 import { CreateQuestionDto } from '../dtos';
 import { UpdateQuestionDto } from '../dtos/update-question.dto';
 import {
@@ -31,7 +31,7 @@ export class QuestionsController {
 
   @Get()
   async getQuestions(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -46,7 +46,7 @@ export class QuestionsController {
     try {
       const questions = await this.questionsService.getQuestions({
         formId,
-        userId: session.user.id,
+        userId: req.user.id,
         isActive: state === ItemState.active,
       });
       return questions;
@@ -60,7 +60,7 @@ export class QuestionsController {
 
   @Post()
   async createQuestion(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -79,7 +79,7 @@ export class QuestionsController {
           ...createQuestionDto,
           createdByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
           // TODO : investigate later if there is a better way to do this
@@ -96,7 +96,7 @@ export class QuestionsController {
 
   @Patch(':id')
   async updateQuestion(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -121,12 +121,12 @@ export class QuestionsController {
       const question = await this.questionsService.updateQuestion({
         formId,
         id,
-        userId: session.user.id,
+        userId: req.user.id,
         data: {
           ...updateQuestionDto,
           lastUpdatedByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
         },
@@ -148,7 +148,7 @@ export class QuestionsController {
 
   @Delete(':id/archive')
   async archiveQuestion(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -185,7 +185,7 @@ export class QuestionsController {
       const question = await this.questionsService.archiveQuestion({
         formId,
         id,
-        userId: session.user.id,
+        userId: req.user.id,
         questionType,
       });
       return question;
@@ -205,7 +205,7 @@ export class QuestionsController {
 
   @Patch(':id/restore')
   async restoreQuestion(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -242,7 +242,7 @@ export class QuestionsController {
       const question = await this.questionsService.restoreQuestion({
         formId,
         id,
-        userId: session.user.id,
+        userId: req.user.id,
         questionType,
       });
       return question;
@@ -262,7 +262,7 @@ export class QuestionsController {
 
   @Delete(':id')
   async deleteQuestion(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -299,7 +299,7 @@ export class QuestionsController {
       await this.questionsService.deleteQuestion({
         formId,
         id,
-        userId: session.user.id,
+        userId: req.user.id,
         questionType,
       });
     } catch (error) {

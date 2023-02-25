@@ -9,10 +9,8 @@ services:
     environment:
       - PORT=${BACKEND_PORT}
       - DATABASE_URL=${DATABASE_URL}
-      - SESSION_SIGN_SECRET=${SESSION_SIGN_SECRET}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY:-168h}
     ports:
       - ${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}
 

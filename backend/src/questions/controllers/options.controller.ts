@@ -1,6 +1,5 @@
 import {
   Controller,
-  Session as GetSession,
   Param,
   Post,
   ParseIntPipe,
@@ -11,9 +10,10 @@ import {
   NotFoundException,
   Query,
   ParseEnumPipe,
+  Req,
 } from '@nestjs/common';
 import { FormNotFoundException } from 'src/forms/exceptions';
-import { UserSession } from 'src/utils/types';
+import { RequestWithUser } from 'src/utils/types';
 import { CreateOptionDto } from '../dtos/create-option.dto';
 import { UpdateOptionDto } from '../dtos/update-option.dto';
 import { FormQuestionNotFoundException } from '../exceptions';
@@ -27,7 +27,7 @@ export class OptionsController {
 
   @Post()
   async createOption(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -52,11 +52,11 @@ export class OptionsController {
       const option = await this.optionService.createOption({
         formId,
         questionId,
-        userId: session.user.id,
+        userId: req.user.id,
         data: {
           createdByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
           questionId,
@@ -78,7 +78,7 @@ export class OptionsController {
 
   @Patch(':id')
   async updateOption(
-    @GetSession() session: UserSession,
+    @Req() req: RequestWithUser,
     @Param(
       'formId',
       new ParseIntPipe({
@@ -127,12 +127,12 @@ export class OptionsController {
         id,
         questionId,
         questionType,
-        userId: session.user.id,
+        userId: req.user.id,
         data: {
           ...updateOptionDto,
           lastUpdatedByUser: {
             connect: {
-              id: session.user.id,
+              id: req.user.id,
             },
           },
         },
