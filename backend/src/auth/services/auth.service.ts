@@ -23,9 +23,10 @@ export class AuthService {
   async register(dto: CreateUserDto): Promise<User> {
     try {
       // hash password before saving
-      dto.password = await hashPassword(dto.password);
+      const { ...payload } = dto;
+      payload.password = await hashPassword(dto.password);
 
-      const user = await this.userService.create(dto);
+      const user = await this.userService.create(payload);
 
       // fire events
       this.eventEmitter.emit(
@@ -65,6 +66,7 @@ export class AuthService {
       );
       return user;
     }
+    return null;
   }
 
   generateToken(payload: JwtPayload): string {

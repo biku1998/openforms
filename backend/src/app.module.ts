@@ -16,7 +16,6 @@ import { QuestionsModule } from './questions/questions.module';
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
-      isGlobal: true,
       ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
     EventEmitterModule.forRoot({

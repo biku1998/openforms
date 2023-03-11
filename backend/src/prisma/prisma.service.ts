@@ -1,6 +1,6 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -40,5 +40,19 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     this.$on('beforeExit', async () => {
       await app.close();
     });
+  }
+
+  async wipeDatabase() {
+    if (this.configService.get('NODE_ENV') === 'production') return;
+
+    const tables = Prisma.dmmf.datamodel.models
+      .map((model) => model.dbName)
+      .filter((table) => table);
+
+    await this.$transaction([
+      ...tables.map((table) =>
+        this.$executeRawUnsafe(`TRUNCATE ${table} CASCADE;`),
+      ),
+    ]);
   }
 }
