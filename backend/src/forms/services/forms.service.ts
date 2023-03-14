@@ -21,6 +21,20 @@ export class FormsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
+  async findOne(params: { id: number; userId?: number }): Promise<Form> {
+    const { id, userId } = params;
+    const form = await this.prismaService.form.findUnique({
+      where: { id },
+    });
+
+    if (!form) throw new FormNotFoundException(id);
+
+    if (userId) {
+      if (form.createdById !== userId) throw new FormNotFoundException(id);
+    }
+    return form;
+  }
+
   async getForm(params: {
     id: number;
     userId?: number;
@@ -44,9 +58,20 @@ export class FormsService {
     return form;
   }
 
-  async createForm({ data }: { data: Prisma.FormCreateInput }): Promise<Form> {
+  async createForm(params: {
+    payload: Pick<Prisma.FormCreateInput, 'title' | 'description'>;
+    userId: number;
+  }): Promise<Form> {
+    const { payload, userId } = params;
     const form = await this.prismaService.form.create({
-      data,
+      data: {
+        ...payload,
+        createdByUser: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
     });
 
     // fire events
@@ -60,14 +85,13 @@ export class FormsService {
     return form;
   }
 
-  async archiveForm(params: {
-    where: Prisma.FormWhereUniqueInput;
-    userId: number;
-  }): Promise<Form> {
+  async archiveForm(params: { id: number; userId: number }): Promise<Form> {
     try {
-      const { where, userId } = params;
+      const { id, userId } = params;
       const form = await this.prismaService.form.update({
-        where,
+        where: {
+          id,
+        },
         data: {
           isActive: false,
           lastUpdatedByUser: {
@@ -82,7 +106,7 @@ export class FormsService {
       this.eventEmitter.emit(
         AppEventType.FORM_ARCHIVED,
         new FormArchivedEvent({
-          id: where.id,
+          id,
           userId,
         }),
       );
@@ -90,21 +114,20 @@ export class FormsService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new FormNotFoundException(params.where.id);
+          throw new FormNotFoundException(params.id);
         }
       }
       throw error;
     }
   }
 
-  async publishForm(params: {
-    where: Prisma.FormWhereUniqueInput;
-    userId: number;
-  }): Promise<Form> {
+  async publishForm(params: { id: number; userId: number }): Promise<Form> {
     try {
-      const { where, userId } = params;
+      const { id, userId } = params;
       const form = await this.prismaService.form.update({
-        where,
+        where: {
+          id,
+        },
         data: {
           isPublished: true,
           lastUpdatedByUser: {
@@ -119,7 +142,7 @@ export class FormsService {
       this.eventEmitter.emit(
         AppEventType.FORM_PUBLISHED,
         new FormPublishedEvent({
-          id: where.id,
+          id,
           userId,
         }),
       );
@@ -128,21 +151,20 @@ export class FormsService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new FormNotFoundException(params.where.id);
+          throw new FormNotFoundException(params.id);
         }
       }
       throw error;
     }
   }
 
-  async unPublishForm(params: {
-    where: Prisma.FormWhereUniqueInput;
-    userId: number;
-  }): Promise<Form> {
+  async unPublishForm(params: { id: number; userId: number }): Promise<Form> {
     try {
-      const { where, userId } = params;
+      const { id, userId } = params;
       const form = await this.prismaService.form.update({
-        where,
+        where: {
+          id,
+        },
         data: {
           isPublished: false,
           lastUpdatedByUser: {
@@ -157,7 +179,7 @@ export class FormsService {
       this.eventEmitter.emit(
         AppEventType.FORM_UNPUBLISHED,
         new FormUnPublishedEvent({
-          id: where.id,
+          id,
           userId,
         }),
       );
@@ -166,7 +188,7 @@ export class FormsService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new FormNotFoundException(params.where.id);
+          throw new FormNotFoundException(params.id);
         }
       }
       throw error;
@@ -218,44 +240,65 @@ export class FormsService {
   }
 
   async updateForm(params: {
-    where: Prisma.FormWhereUniqueInput;
-    data: Prisma.FormUpdateInput;
+    id: number;
+    payload: Pick<Prisma.FormUpdateInput, 'title' | 'description'> & {
+      headerImgFileUploadId?: number;
+    };
+    userId: number;
   }): Promise<Form> {
     try {
-      const { where, data } = params;
+      const { id, payload, userId } = params;
+      const { headerImgFileUploadId, ...updatePayload } = payload;
+
+      if (headerImgFileUploadId) {
+        updatePayload['headerImg'] = {
+          connect: {
+            id: headerImgFileUploadId,
+          },
+        };
+      }
+
       const form = await this.prismaService.form.update({
-        where,
-        data,
+        where: {
+          id,
+        },
+        data: {
+          ...updatePayload,
+          lastUpdatedByUser: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
       });
 
       // fire events
       this.eventEmitter.emit(
         AppEventType.FORM_UPDATED,
         new FormUpdatedEvent({
-          payload: data,
-          id: where.id,
-          userId: data.lastUpdatedByUser.connect.id,
+          payload,
+          id,
+          userId,
         }),
       );
       return form;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new FormNotFoundException(params.where.id);
+          throw new FormNotFoundException(params.id);
         }
       }
       throw error;
     }
   }
 
-  async restoreForm(params: {
-    where: Prisma.FormWhereUniqueInput;
-    userId: number;
-  }): Promise<Form> {
+  async restoreForm(params: { id: number; userId: number }): Promise<Form> {
     try {
-      const { where, userId } = params;
+      const { id, userId } = params;
       const form = await this.prismaService.form.update({
-        where,
+        where: {
+          id,
+        },
         data: {
           isActive: true,
           lastUpdatedByUser: {
@@ -270,7 +313,7 @@ export class FormsService {
       this.eventEmitter.emit(
         AppEventType.FORM_RESTORED,
         new FormRestoredEvent({
-          id: where.id,
+          id,
           userId,
         }),
       );
@@ -278,7 +321,7 @@ export class FormsService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new FormNotFoundException(params.where.id);
+          throw new FormNotFoundException(params.id);
         }
       }
       throw error;

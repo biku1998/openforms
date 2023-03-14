@@ -5,10 +5,13 @@ import { Prisma, PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {
+    const NODE_ENV = configService.get('NODE_ENV');
     super({
       log:
-        configService.get('NODE_ENV') !== 'production'
-          ? ['warn', 'error'] // 'query', 'info',
+        NODE_ENV !== 'production'
+          ? NODE_ENV === 'test'
+            ? []
+            : ['warn', 'error', 'query', 'info']
           : [],
     });
   }
