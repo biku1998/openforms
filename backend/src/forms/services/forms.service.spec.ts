@@ -57,7 +57,7 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
     expect(form).toHaveProperty('id');
     expect(form).toHaveProperty('title', payload.title);
@@ -80,9 +80,9 @@ describe('FormsService', () => {
       title: 'workshop feedback',
       description: 'collecting feedback for the data science live workshop',
     };
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
-    const publishedForm = await service.publishForm({
+    const publishedForm = await service.publish({
       id: form.id,
       userId,
     });
@@ -104,7 +104,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to publish form that does not exists', async () => {
     await expect(
-      service.publishForm({
+      service.publish({
         id: 101,
         userId,
       }),
@@ -117,9 +117,9 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
       isPublished: true,
     };
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
-    const unPublishedForm = await service.unPublishForm({
+    const unPublishedForm = await service.unpublish({
       id: form.id,
       userId,
     });
@@ -139,7 +139,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to un-publish form that does not exists', async () => {
     await expect(
-      service.unPublishForm({
+      service.unpublish({
         id: 101,
         userId,
       }),
@@ -152,9 +152,9 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
-    const updatedForm = await service.updateForm({
+    const updatedForm = await service.update({
       id: form.id,
       userId,
       payload: {
@@ -182,7 +182,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to update form that does not exists', async () => {
     await expect(
-      service.updateForm({
+      service.update({
         id: 101,
         userId,
         payload: {
@@ -198,9 +198,9 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
-    const archivedForm = await service.archiveForm({
+    const archivedForm = await service.archive({
       id: form.id,
       userId,
     });
@@ -219,7 +219,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to archive form that does not exists', async () => {
     await expect(
-      service.archiveForm({
+      service.archive({
         id: 1011,
         userId,
       }),
@@ -232,9 +232,9 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    const form = await service.createForm({ payload, userId });
+    const form = await service.create({ payload, userId });
 
-    const archivedForm = await service.archiveForm({
+    const archivedForm = await service.archive({
       id: form.id,
       userId,
     });
@@ -271,11 +271,11 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
-    const form = await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    const form = await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
 
     const fetchedForm = await service.findOne({
       id: form.id,
@@ -299,11 +299,11 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
-    const form = await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
-    await service.createForm({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    const form = await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
 
     await expect(
       service.findOne({
@@ -313,11 +313,93 @@ describe('FormsService', () => {
     ).rejects.toThrow(FormNotFoundException);
   });
 
-  it.todo('should get forms with state filter');
+  it('should get forms with state filter', async () => {
+    const payload = {
+      title: 'workshop feedback',
+      description: 'collecting feedback for the data science live workshop',
+    };
 
-  it.todo('should get forms with matching title filter');
+    const formOne = await service.create({ payload, userId });
+    await service.publish({
+      id: formOne.id,
+      userId,
+    });
+    const formTwo = await service.create({ payload, userId });
+    await service.publish({
+      id: formTwo.id,
+      userId,
+    });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
 
-  it.todo('should get forms sorted with createdAt in asc order');
+    let forms = await service.findMany({
+      userId,
+    });
 
-  it.todo('should get forms sorted with createdAt in desc order');
+    expect(forms).toHaveLength(2);
+    expect(forms[0]).toHaveProperty('id', formOne.id);
+
+    forms = await service.findMany({
+      userId,
+      isPublished: false,
+    });
+
+    expect(forms).toHaveLength(3);
+  });
+
+  it('should get forms with matching title filter', async () => {
+    const payload = {
+      title: 'workshop feedback',
+      description: 'collecting feedback for the data science live workshop',
+    };
+
+    const formOne = await service.create({
+      payload: { ...payload, title: 'another one' },
+      userId,
+    });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+
+    const forms = await service.findMany({
+      userId,
+      isPublished: false,
+      searchString: 'another one',
+    });
+
+    expect(forms).toHaveLength(1);
+    expect(forms[0]).toHaveProperty('id', formOne.id);
+  });
+
+  it('should get forms sorted with createdAt in desc order', async () => {
+    const payload = {
+      title: 'workshop feedback',
+      description: 'collecting feedback for the data science live workshop',
+    };
+
+    const firstForm = await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
+    const lastForm = await service.create({ payload, userId });
+
+    const forms = await service.findMany({
+      userId,
+      isPublished: false,
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+      ],
+    });
+
+    expect(forms[0]).toHaveProperty('id', lastForm.id);
+    expect(forms[8]).toHaveProperty('id', firstForm.id);
+  });
 });

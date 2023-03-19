@@ -30,7 +30,9 @@ export class FormsController {
   async getForms(
     @Req() req: RequestWithUser,
     @Query('state', new DefaultValuePipe(ItemState.active)) state?: string,
-    @Query('searchString') searchString?: string,
+    @Query('published', new DefaultValuePipe(false))
+    @Query('searchString')
+    searchString?: string,
     @Query('sort') sort?: string,
   ): Promise<FormModel[]> {
     if (Object.keys(ItemState).includes(state) === false) {
@@ -38,16 +40,6 @@ export class FormsController {
     }
 
     try {
-      // construct title, description search condition
-      const or = searchString
-        ? {
-            OR: [
-              { title: { contains: searchString } },
-              { description: { contains: searchString } },
-            ],
-          }
-        : {};
-
       // construct sort condition
       const orderBy = [];
 
@@ -65,12 +57,9 @@ export class FormsController {
         }
       }
 
-      const forms = await this.formService.getForms({
-        where: {
-          createdById: req.user.id,
-          isActive: state === 'active',
-          ...or,
-        },
+      const forms = await this.formService.findMany({
+        userId: req.user.id,
+        isActive: state === 'active',
         orderBy,
       });
       return forms;
@@ -94,18 +83,10 @@ export class FormsController {
     @Body() updateFormDto: UpdateFormDto,
   ): Promise<FormModel> {
     try {
-      const updatedForm = await this.formService.updateForm({
-        where: {
-          id,
-        },
-        data: {
-          ...updateFormDto,
-          lastUpdatedByUser: {
-            connect: {
-              id: req.user.id,
-            },
-          },
-        },
+      const updatedForm = await this.formService.update({
+        id,
+        payload: updateFormDto,
+        userId: req.user.id,
       });
       return updatedForm;
     } catch (error) {
@@ -122,15 +103,9 @@ export class FormsController {
     @Body() createFormDto: CreateFormDto,
   ): Promise<FormModel> {
     try {
-      const form = await this.formService.createForm({
-        data: {
-          ...createFormDto,
-          createdByUser: {
-            connect: {
-              id: req.user.id,
-            },
-          },
-        },
+      const form = await this.formService.create({
+        payload: createFormDto,
+        userId: req.user.id,
       });
 
       return form;
@@ -153,10 +128,8 @@ export class FormsController {
     id: number,
   ) {
     try {
-      await this.formService.archiveForm({
-        where: {
-          id,
-        },
+      await this.formService.archive({
+        id,
         userId: req.user.id,
       });
     } catch (error) {
@@ -181,8 +154,8 @@ export class FormsController {
     id: number,
   ) {
     try {
-      await this.formService.publishForm({
-        where: { id },
+      await this.formService.publish({
+        id,
         userId: req.user.id,
       });
     } catch (error) {
@@ -207,10 +180,8 @@ export class FormsController {
     id: number,
   ) {
     try {
-      await this.formService.unPublishForm({
-        where: {
-          id,
-        },
+      await this.formService.unPublish({
+        id,
         userId: req.user.id,
       });
     } catch (error) {
@@ -235,10 +206,8 @@ export class FormsController {
     id: number,
   ) {
     try {
-      await this.formService.restoreForm({
-        where: {
-          id,
-        },
+      await this.formService.restore({
+        id,
         userId: req.user.id,
       });
     } catch (error) {

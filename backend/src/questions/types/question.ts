@@ -8,7 +8,16 @@ import {
   InfoQuestion as InfoQuestionPrisma,
   TextQuestion as TextQuestionPrisma,
   QuestionType as QuestionTypePrisma,
+  ChoiceType as ChoiceTypePrisma,
 } from '@prisma/client';
+
+export const ChoiceType = {
+  RADIO: ChoiceTypePrisma.RADIO,
+  DROP_DOWN: ChoiceTypePrisma.DROP_DOWN,
+  CHECKBOX: ChoiceTypePrisma.CHECKBOX,
+} as const;
+
+export type ChoiceType = (typeof ChoiceType)[keyof typeof ChoiceType];
 
 export const QuestionType = {
   CHOICE: QuestionTypePrisma.CHOICE,
@@ -24,31 +33,46 @@ export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType];
 
 type ChoiceQuestionCreateInput = {
   type: typeof QuestionType.CHOICE;
-} & Prisma.ChoiceQuestionCreateInput;
+} & Pick<
+  Prisma.ChoiceQuestionCreateInput,
+  'content' | 'choiceType' | 'shuffleOptions'
+>;
 
 type FileUploadQuestionCreateInput = {
   type: typeof QuestionType.FILE_UPLOAD;
-} & Prisma.FileUploadQuestionCreateInput;
+} & Pick<
+  Prisma.FileUploadQuestionCreateInput,
+  'content' | 'maxFileSize' | 'maxFiles' | 'acceptedFileTypes'
+>;
 
 type DateQuestionCreateInput = {
   type: typeof QuestionType.DATE;
-} & Prisma.DateQuestionCreateInput;
+} & Pick<
+  Prisma.DateQuestionCreateInput,
+  'content' | 'includeTime' | 'includeYear'
+>;
 
 type NpsQuestionCreateInput = {
   type: typeof QuestionType.NPS;
-} & Prisma.NpsQuestionCreateInput;
+} & Pick<
+  Prisma.NpsQuestionCreateInput,
+  'content' | 'high' | 'low' | 'highLabel' | 'lowLabel'
+>;
 
 type RatingQuestionCreateInput = {
   type: typeof QuestionType.RATING;
-} & Prisma.RatingQuestionCreateInput;
+} & Pick<
+  Prisma.RatingQuestionCreateInput,
+  'content' | 'high' | 'low' | 'highLabel' | 'lowLabel' | 'ratingType'
+>;
 
 type InfoQuestionCreateInput = {
   type: typeof QuestionType.INFO;
-} & Prisma.InfoQuestionCreateInput;
+} & Pick<Prisma.InfoQuestionCreateInput, 'content' | 'infoType'>;
 
 type TextQuestionCreateInput = {
   type: typeof QuestionType.TEXT;
-} & Prisma.TextQuestionCreateInput;
+} & Pick<Prisma.TextQuestionCreateInput, 'content' | 'paragraph'>;
 
 export type QuestionCreateInput =
   | ChoiceQuestionCreateInput
@@ -98,31 +122,43 @@ export type Question =
 
 type ChoiceQuestionUpdateInput = {
   type: typeof QuestionType.CHOICE;
-} & Prisma.ChoiceQuestionUpdateInput;
+} & Pick<Prisma.ChoiceQuestionUpdateInput, 'content' | 'shuffleOptions'>;
 
 type FileUploadQuestionUpdateInput = {
   type: typeof QuestionType.FILE_UPLOAD;
-} & Prisma.FileUploadQuestionUpdateInput;
+} & Pick<
+  Prisma.FileUploadQuestionUpdateInput,
+  'content' | 'maxFileSize' | 'maxFiles' | 'acceptedFileTypes'
+>;
 
 type DateQuestionUpdateInput = {
   type: typeof QuestionType.DATE;
-} & Prisma.DateQuestionUpdateInput;
+} & Pick<
+  Prisma.DateQuestionUpdateInput,
+  'content' | 'includeTime' | 'includeYear'
+>;
 
 type NpsQuestionUpdateInput = {
   type: typeof QuestionType.NPS;
-} & Prisma.NpsQuestionUpdateInput;
+} & Pick<
+  Prisma.NpsQuestionUpdateInput,
+  'content' | 'high' | 'low' | 'highLabel' | 'lowLabel'
+>;
 
 type RatingQuestionUpdateInput = {
   type: typeof QuestionType.RATING;
-} & Prisma.RatingQuestionUpdateInput;
+} & Pick<
+  Prisma.RatingQuestionUpdateInput,
+  'content' | 'ratingType' | 'high' | 'low' | 'lowLabel' | 'highLabel'
+>;
 
 type InfoQuestionUpdateInput = {
   type: typeof QuestionType.INFO;
-} & Prisma.InfoQuestionUpdateInput;
+} & Pick<Prisma.InfoQuestionUpdateInput, 'content' | 'infoType'>;
 
 type TextQuestionUpdateInput = {
   type: typeof QuestionType.TEXT;
-} & Prisma.TextQuestionUpdateInput;
+} & Pick<Prisma.TextQuestionUpdateInput, 'content' | 'paragraph'>;
 
 export type QuestionUpdateInput =
   | ChoiceQuestionUpdateInput

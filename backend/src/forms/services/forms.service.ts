@@ -12,7 +12,7 @@ import {
   FormUpdatedEvent,
 } from '../events';
 import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
-import { ArchivedFormException, FormNotFoundException } from '../exceptions';
+import { FormNotFoundException } from '../exceptions';
 
 @Injectable()
 export class FormsService {
@@ -35,30 +35,7 @@ export class FormsService {
     return form;
   }
 
-  async getForm(params: {
-    id: number;
-    userId?: number;
-    title?: string;
-  }): Promise<Form> {
-    const { id, userId, title } = params;
-    if (userId || title) {
-      const form = await this.prismaService.form.findFirst({
-        where: {
-          id,
-          createdById: userId,
-          title,
-        },
-      });
-      if (!form) throw new FormNotFoundException(id);
-      return form;
-    }
-
-    const form = await this.prismaService.form.findUnique({ where: { id } });
-    if (!form) if (!form) throw new FormNotFoundException(id);
-    return form;
-  }
-
-  async createForm(params: {
+  async create(params: {
     payload: Pick<Prisma.FormCreateInput, 'title' | 'description'>;
     userId: number;
   }): Promise<Form> {
@@ -85,7 +62,7 @@ export class FormsService {
     return form;
   }
 
-  async archiveForm(params: { id: number; userId: number }): Promise<Form> {
+  async archive(params: { id: number; userId: number }): Promise<Form> {
     try {
       const { id, userId } = params;
       const form = await this.prismaService.form.update({
@@ -121,7 +98,7 @@ export class FormsService {
     }
   }
 
-  async publishForm(params: { id: number; userId: number }): Promise<Form> {
+  async publish(params: { id: number; userId: number }): Promise<Form> {
     try {
       const { id, userId } = params;
       const form = await this.prismaService.form.update({
@@ -158,7 +135,7 @@ export class FormsService {
     }
   }
 
-  async unPublishForm(params: { id: number; userId: number }): Promise<Form> {
+  async unPublish(params: { id: number; userId: number }): Promise<Form> {
     try {
       const { id, userId } = params;
       const form = await this.prismaService.form.update({
@@ -195,51 +172,65 @@ export class FormsService {
     }
   }
 
-  async getForms(
-    params: {
-      where?: Prisma.FormWhereInput;
-      orderBy?: Prisma.FormOrderByWithRelationInput[];
-    } = {},
-  ): Promise<Form[]> {
-    const { where, orderBy } = params;
+  async findMany(params: {
+    userId: number;
+    searchString?: string;
+    isActive?: boolean;
+    orderBy?: { [k: string]: 'asc' | 'desc' }[];
+  }): Promise<Form[]> {
+    const { userId, searchString, isActive = true, orderBy } = params;
+    // construct title, description search condition
+    const or = searchString
+      ? {
+          OR: [
+            { title: { contains: searchString } },
+            { description: { contains: searchString } },
+          ],
+        }
+      : {};
+
     const forms = await this.prismaService.form.findMany({
-      where,
+      where: {
+        createdById: userId,
+        isActive,
+        ...or,
+      },
       orderBy,
     });
 
     return forms;
   }
 
-  async getFormById(id: number): Promise<Form> {
-    const form = await this.prismaService.form.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!form) throw new FormNotFoundException(id);
+  // async getFormById(id: number): Promise<Form> {
+  //   const form = await this.prismaService.form.findUnique({
+  //     where: {
+  //       id,
+  //     },
+  //   });
+  //   if (!form) throw new FormNotFoundException(id);
 
-    if (form.isActive === false) throw new ArchivedFormException(id);
-    return form;
-  }
+  //   if (form.isActive === false) throw new ArchivedFormException(id);
+  //   return form;
+  // }
 
-  async getFormByIdAndCreator(params: {
-    id: number;
-    creatorId: number;
-  }): Promise<Form> {
-    const { id, creatorId } = params;
-    const form = await this.prismaService.form.findFirst({
-      where: {
-        id,
-        createdById: creatorId,
-      },
-    });
-    if (!form) throw new FormNotFoundException(id);
+  // async getFormByIdAndCreator(params: {
+  //   id: number;
+  //   creatorId: number;
+  // }): Promise<Form> {
+  //   const { id, creatorId } = params;
+  //   const form = await this.prismaService.form.findFirst({
+  //     where: {
+  //       id,
+  //       createdById: creatorId,
+  //     },
+  //   });
+  //   if (!form) throw new FormNotFoundException(id);
 
-    if (form.isActive === false) throw new ArchivedFormException(id);
-    return form;
-  }
+  //   if (form.isActive === false) throw new ArchivedFormException(id);
+  //   return form;
+  // }
 
-  async updateForm(params: {
+  async update(params: {
     id: number;
     payload: Pick<Prisma.FormUpdateInput, 'title' | 'description'> & {
       headerImgFileUploadId?: number;
@@ -292,7 +283,7 @@ export class FormsService {
     }
   }
 
-  async restoreForm(params: { id: number; userId: number }): Promise<Form> {
+  async restore(params: { id: number; userId: number }): Promise<Form> {
     try {
       const { id, userId } = params;
       const form = await this.prismaService.form.update({
