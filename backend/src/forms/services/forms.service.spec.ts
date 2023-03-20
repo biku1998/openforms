@@ -119,7 +119,7 @@ describe('FormsService', () => {
     };
     const form = await service.create({ payload, userId });
 
-    const unPublishedForm = await service.unpublish({
+    const unPublishedForm = await service.unPublish({
       id: form.id,
       userId,
     });
@@ -139,7 +139,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to un-publish form that does not exists', async () => {
     await expect(
-      service.unpublish({
+      service.unPublish({
         id: 101,
         userId,
       }),
@@ -239,7 +239,7 @@ describe('FormsService', () => {
       userId,
     });
 
-    const restoredForm = await service.restoreForm({
+    const restoredForm = await service.restore({
       id: archivedForm.id,
       userId,
     });
@@ -258,7 +258,7 @@ describe('FormsService', () => {
 
   it('should throw an exception if we are try to restore an archived form that does not exists', async () => {
     await expect(
-      service.restoreForm({
+      service.restore({
         id: 1011,
         userId,
       }),
@@ -319,33 +319,17 @@ describe('FormsService', () => {
       description: 'collecting feedback for the data science live workshop',
     };
 
-    const formOne = await service.create({ payload, userId });
-    await service.publish({
-      id: formOne.id,
-      userId,
-    });
-    const formTwo = await service.create({ payload, userId });
-    await service.publish({
-      id: formTwo.id,
-      userId,
-    });
+    await service.create({ payload, userId });
+    await service.create({ payload, userId });
     await service.create({ payload, userId });
     await service.create({ payload, userId });
     await service.create({ payload, userId });
 
-    let forms = await service.findMany({
+    const forms = await service.findMany({
       userId,
     });
 
-    expect(forms).toHaveLength(2);
-    expect(forms[0]).toHaveProperty('id', formOne.id);
-
-    forms = await service.findMany({
-      userId,
-      isPublished: false,
-    });
-
-    expect(forms).toHaveLength(3);
+    expect(forms).toHaveLength(5);
   });
 
   it('should get forms with matching title filter', async () => {
@@ -365,7 +349,6 @@ describe('FormsService', () => {
 
     const forms = await service.findMany({
       userId,
-      isPublished: false,
       searchString: 'another one',
     });
 
@@ -391,7 +374,6 @@ describe('FormsService', () => {
 
     const forms = await service.findMany({
       userId,
-      isPublished: false,
       orderBy: [
         {
           createdAt: 'desc',

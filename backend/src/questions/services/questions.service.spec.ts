@@ -280,42 +280,129 @@ describe('QuestionsService', () => {
         questionType: QuestionType.CHOICE,
         userId,
       }),
+    ).rejects.toThrow(QuestionNotFoundException);
+  });
+
+  it('should throw exception if we try to archive a question for a form that does not exist', async () => {
+    await expect(
+      service.archive({
+        formId: 1011,
+        id: 101,
+        questionType: QuestionType.CHOICE,
+        userId,
+      }),
+    ).rejects.toThrow(FormNotFoundException);
+  });
+
+  it('should throw exception if we try to archive a question for an archived form', async () => {
+    await formsService.archive({
+      id: formId,
+      userId,
+    });
+
+    await expect(
+      service.archive({
+        formId,
+        id: 101,
+        questionType: QuestionType.CHOICE,
+        userId,
+      }),
     ).rejects.toThrow(ArchivedFormException);
   });
 
-  it.todo(
-    'should throw exception if we try to archive a question for a form that does not exist',
-  );
+  it('should restore a question', async () => {
+    const payload = {
+      type: QuestionType.CHOICE,
+      choiceType: ChoiceType.RADIO,
+      content: 'Mcq question',
+    };
 
-  it.todo(
-    'should throw exception if we try to archive a question for an archived form',
-  );
+    const question = await service.create({
+      formId,
+      userId,
+      payload,
+    });
 
-  it.todo('restore a question');
+    const archivedQuestion = await service.archive({
+      formId,
+      userId,
+      id: question.id,
+      questionType: payload.type,
+    });
 
-  it.todo(
-    'should throw exception if we try to restore a question that does not exist',
-  );
+    const restoredQuestion = await service.restore({
+      formId,
+      userId,
+      id: archivedQuestion.id,
+      questionType: payload.type,
+    });
 
-  it.todo(
-    'should throw exception if we try to restore a question for a form that does not exist',
-  );
+    expect(restoredQuestion.isActive).toBe(true);
 
-  it.todo(
-    'should throw exception if we try to restore a question for an archived form',
-  );
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      AppEventType.QUESTION_RESTORED,
+      {
+        eventType: AppEventType.QUESTION_RESTORED,
+        payload: {
+          id: question.id,
+          userId,
+          formId,
+        },
+        userId,
+      },
+    );
+  });
 
-  it.todo('delete a question');
+  it('should throw exception if we try to restore a question that does not exist', async () => {
+    await expect(
+      service.restore({
+        formId,
+        id: 101,
+        questionType: QuestionType.CHOICE,
+        userId,
+      }),
+    ).rejects.toThrow(QuestionNotFoundException);
+  });
 
-  it.todo(
-    'should throw exception if we try to delete a question that does not exist',
-  );
+  it('should throw exception if we try to restore a question for a form that does not exist', async () => {
+    await expect(
+      service.archive({
+        formId: 1011,
+        id: 101,
+        questionType: QuestionType.CHOICE,
+        userId,
+      }),
+    ).rejects.toThrow(FormNotFoundException);
+  });
 
-  it.todo(
-    'should throw exception if we try to delete a question for a form that does not exist',
-  );
+  it('should throw exception if we try to restore a question for an archived form', async () => {
+    await formsService.archive({
+      id: formId,
+      userId,
+    });
 
-  it.todo(
-    'should throw exception if we try to delete a question for an archived form',
-  );
+    await expect(
+      service.archive({
+        formId,
+        id: 101,
+        questionType: QuestionType.CHOICE,
+        userId,
+      }),
+    ).rejects.toThrow(ArchivedFormException);
+  });
+
+  // TODO : add tests when we have delete question support from service
+  // it.todo('should delete a question');
+
+  // it.todo(
+  //   'should throw exception if we try to delete a question that does not exist',
+  // );
+
+  // it.todo(
+  //   'should throw exception if we try to delete a question for a form that does not exist',
+  // );
+
+  // it.todo(
+  //   'should throw exception if we try to delete a question for an archived form',
+  // );
 });
