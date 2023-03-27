@@ -385,7 +385,7 @@ model Option {
 
   // relations
   gradingCorrectOption GradingCorrectOption?
-  fileUpload           FileUpload?           @relation(fields: [imageFileId], references: [id])
+  image                FileUpload?           @relation(fields: [imageFileId], references: [id])
   createdByUser        User                  @relation("createdByUser", fields: [createdById], references: [id])
   lastUpdatedByUser    User?                 @relation("lastUpdatedByUser", fields: [lastUpdatedById], references: [id])
 

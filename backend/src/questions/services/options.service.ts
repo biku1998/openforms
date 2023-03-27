@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Option, Prisma } from '@prisma/client';
 import { AppEventType } from 'src/events/types/events';
+import { ArchivedFormException } from 'src/forms/exceptions';
 import { FormsService } from 'src/forms/services';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
@@ -12,8 +13,15 @@ import {
   OptionRestoredEvent,
   OptionDeletedEvent,
 } from '../events';
+import {
+  ArchivedQuestionException,
+  QuestionNotFoundException,
+} from '../exceptions';
 
-import { OptionNotFoundException } from '../exceptions/option.exception';
+import {
+  ArchivedOptionException,
+  OptionNotFoundException,
+} from '../exceptions/option.exception';
 import { QuestionType } from '../types/question';
 import { QuestionsService } from './questions.service';
 
@@ -22,89 +30,82 @@ export class OptionsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly questionService: QuestionsService,
-    private readonly formService: FormsService,
+    private readonly formsService: FormsService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async getOption(params: {
-    id: number;
-    userId?: number;
-    questionId?: number;
-    questionType?: QuestionType;
-  }): Promise<Option> {
-    const { id, userId, questionId, questionType } = params;
-    if (userId || questionType) {
-      const option = await this.prismaService.option.findFirst({
-        where: {
-          id,
-          createdById: userId,
-          questionId,
-          questionType,
-        },
-      });
-
-      if (!option)
-        throw new OptionNotFoundException({
-          optionId: id,
-          questionId,
-          questionType,
-        });
-
-      return option;
-    }
+  async findOne(params: { id: number; userId: number }) {
+    const { id, userId } = params;
     const option = await this.prismaService.option.findUnique({
       where: {
-        id_questionId: {
-          id,
-          questionId,
-        },
+        id,
       },
     });
 
-    if (!option)
-      throw new OptionNotFoundException({
-        optionId: id,
-        questionId,
-        questionType,
-      });
+    if (!option) throw new OptionNotFoundException(id);
+
+    if (option.createdById !== userId) throw new OptionNotFoundException(id);
 
     return option;
   }
 
-  async createOption(params: {
+  async create(params: {
     formId: number;
     questionId: number;
-    data: Prisma.OptionCreateInput;
+    payload: Pick<
+      Prisma.OptionCreateInput,
+      'content' | 'position' | 'questionType'
+    >;
     userId: number;
   }): Promise<Option> {
     try {
-      const { formId, questionId, data, userId } = params;
-      // check if form exists with creator
-      await this.formService.getForm({
+      const { formId, questionId, payload, userId } = params;
+
+      const form = await this.formsService.findOne({
         id: formId,
         userId,
       });
 
-      // check if formQuestion exists
-      await this.questionService.getFormQuestion({
-        formId,
-        questionId,
-        questionType: data.questionType,
+      if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+      await this.questionService.findOne({
+        id: questionId,
+        questionType: payload.questionType,
+        userId,
       });
 
+      const question = await this.questionService.findOne({
+        id: questionId,
+        questionType: payload.questionType,
+        userId,
+      });
+
+      if (question.isActive === false)
+        throw new ArchivedQuestionException(questionId);
+
       // create option
-      const option = await this.prismaService.option.create({ data });
+      const option = await this.prismaService.option.create({
+        data: {
+          ...payload,
+          createdByUser: {
+            connect: {
+              id: userId,
+            },
+          },
+          questionId,
+        },
+      });
 
       // fire events
       this.eventEmitter.emit(
         AppEventType.OPTION_CREATED,
         new OptionCreatedEvent({
           id: option.id,
-          payload: data,
+          payload,
           userId,
           formId,
           questionId,
-          questionType: data.questionType,
+          questionType: payload.questionType,
         }),
       );
 
@@ -114,234 +115,213 @@ export class OptionsService {
     }
   }
 
-  async updateOption(params: {
+  async update(params: {
     formId: number;
     questionId: number;
     questionType: QuestionType;
     id: number;
-    data: Prisma.OptionUpdateInput;
+    payload: Pick<Prisma.OptionUpdateInput, 'content' | 'position'> & {
+      imageFileId?: number;
+    };
     userId: number;
   }): Promise<Option> {
-    try {
-      const { formId, questionId, data, userId, questionType, id } = params;
-      // check if form exists with creator
-      await this.formService.getForm({
-        id: formId,
-        userId,
-      });
+    const { formId, questionId, payload, userId, questionType, id } = params;
 
-      // check if formQuestion exists
-      await this.questionService.getFormQuestion({
+    const { imageFileId, ...updatePayload } = payload;
+
+    if (imageFileId) {
+      updatePayload['image'] = {
+        connect: {
+          id: imageFileId,
+        },
+      };
+    }
+
+    const form = await this.formsService.findOne({
+      id: formId,
+      userId,
+    });
+
+    if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+    const question = await this.questionService.findOne({
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    if (question.isActive === false)
+      throw new ArchivedQuestionException(questionId);
+
+    if (
+      (await this.questionService.doesQuestionExistInForm({
         formId,
         questionId,
         questionType,
-      });
+      })) === false
+    )
+      throw new QuestionNotFoundException(questionId);
 
-      // update option
-      const option = await this.prismaService.option.update({
-        where: { id },
-        data,
-      });
+    const optionToUpdate = await this.findOne({
+      id,
+      userId,
+    });
 
-      // fire events
-      this.eventEmitter.emit(
-        AppEventType.OPTION_UPDATED,
-        new OptionUpdatedEvent({
-          id: option.id,
-          payload: data,
-          userId,
-          formId,
-          questionId,
-          questionType,
-        }),
-      );
+    if (optionToUpdate.isActive === false)
+      throw new ArchivedOptionException(id);
 
-      return option;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          const { questionId, id, questionType } = params;
-          throw new OptionNotFoundException({
-            optionId: id,
-            questionId,
-            questionType,
-          });
-        }
-      }
-      throw error;
-    }
+    // update option
+    const option = await this.prismaService.option.update({
+      where: { id },
+      data: {
+        ...updatePayload,
+        lastUpdatedByUser: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    // fire events
+    this.eventEmitter.emit(
+      AppEventType.OPTION_UPDATED,
+      new OptionUpdatedEvent({
+        id: option.id,
+        payload,
+        userId,
+        formId,
+        questionId,
+        questionType,
+      }),
+    );
+
+    return option;
   }
 
-  async archiveOption(params: {
+  async archive(params: {
     formId: number;
     questionId: number;
     questionType: QuestionType;
     id: number;
     userId: number;
-  }): Promise<boolean> {
-    try {
-      const { formId, questionId, id, questionType, userId } = params;
+  }) {
+    const { id, formId, questionId, questionType, userId } = params;
 
-      // check if form exists with creator
-      await this.formService.getForm({
-        id: formId,
-        userId,
-      });
+    const form = await this.formsService.findOne({
+      id: formId,
+      userId,
+    });
 
-      // check if formQuestion exists
-      await this.questionService.getFormQuestion({
+    if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+    const question = await this.questionService.findOne({
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    if (question.isActive === false)
+      throw new ArchivedQuestionException(questionId);
+
+    if (
+      (await this.questionService.doesQuestionExistInForm({
         formId,
         questionId,
         questionType,
-      });
+      })) === false
+    )
+      throw new QuestionNotFoundException(questionId);
 
-      // archive options
-      await this.prismaService.option.update({
-        where: {
-          id_questionId: {
-            id,
-            questionId,
-          },
-        },
-        data: {
-          isActive: false,
-        },
-      });
+    await this.findOne({
+      id,
+      userId,
+    });
 
-      // fire events
-      this.eventEmitter.emit(
-        AppEventType.OPTION_ARCHIVED,
-        new OptionArchivedEvent({
-          id,
-          userId,
-          formId,
-          questionId,
-          questionType,
-        }),
-      );
+    const option = await this.prismaService.option.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
+    });
 
-      return true;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new OptionNotFoundException({
-            ...params,
-            optionId: params.id,
-          });
-        }
-      }
-      throw error;
-    }
+    // fire events
+    this.eventEmitter.emit(
+      AppEventType.OPTION_ARCHIVED,
+      new OptionArchivedEvent({
+        id: option.id,
+        userId,
+        formId,
+        questionId,
+        questionType,
+      }),
+    );
+
+    return option;
   }
 
-  async restoreOption(params: {
+  async restore(params: {
     formId: number;
     questionId: number;
     questionType: QuestionType;
     id: number;
     userId: number;
-  }): Promise<boolean> {
-    try {
-      const { formId, questionId, id, questionType, userId } = params;
+  }) {
+    const { id, formId, questionId, questionType, userId } = params;
 
-      // check if form exists with creator
-      await this.formService.getForm({
-        id: formId,
-        userId,
-      });
+    const form = await this.formsService.findOne({
+      id: formId,
+      userId,
+    });
 
-      // check if formQuestion exists
-      await this.questionService.getFormQuestion({
+    if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+    const question = await this.questionService.findOne({
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    if (question.isActive === false)
+      throw new ArchivedQuestionException(questionId);
+
+    if (
+      (await this.questionService.doesQuestionExistInForm({
         formId,
         questionId,
         questionType,
-      });
+      })) === false
+    )
+      throw new QuestionNotFoundException(questionId);
 
-      // archive options
-      await this.prismaService.option.update({
-        where: {
-          id_questionId: {
-            id,
-            questionId,
-          },
-        },
-        data: {
-          isActive: true,
-        },
-      });
+    await this.findOne({
+      id,
+      userId,
+    });
 
-      // fire events
-      this.eventEmitter.emit(
-        AppEventType.OPTION_RESTORED,
-        new OptionRestoredEvent({
-          id,
-          userId,
-          formId,
-          questionId,
-          questionType,
-        }),
-      );
+    const option = await this.prismaService.option.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+      },
+    });
 
-      return true;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PrismaErrorCode.RECORD_NOT_FOUND) {
-          throw new OptionNotFoundException({
-            ...params,
-            optionId: params.id,
-          });
-        }
-      }
-      throw error;
-    }
-  }
-
-  async deleteOption(params: {
-    formId: number;
-    questionId: number;
-    questionType: QuestionType;
-    id: number;
-    userId: number;
-  }): Promise<boolean> {
-    try {
-      const { formId, questionId, userId, questionType, id } = params;
-      // check if form exists with creator
-      await this.formService.getForm({
-        id: formId,
+    // fire events
+    this.eventEmitter.emit(
+      AppEventType.OPTION_RESTORED,
+      new OptionRestoredEvent({
+        id: option.id,
         userId,
-      });
-
-      // check if formQuestion exists
-      await this.questionService.getFormQuestion({
         formId,
         questionId,
         questionType,
-      });
+      }),
+    );
 
-      await this.prismaService.option.delete({
-        where: {
-          id_questionId: {
-            id,
-            questionId,
-          },
-        },
-      });
-
-      // fire events
-      this.eventEmitter.emit(
-        AppEventType.OPTION_DELETED,
-        new OptionDeletedEvent({
-          id,
-          userId,
-          formId,
-          questionId,
-          questionType,
-        }),
-      );
-
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    return option;
   }
 }

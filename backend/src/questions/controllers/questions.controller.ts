@@ -44,7 +44,7 @@ export class QuestionsController {
     @Query('state', new DefaultValuePipe(ItemState.active)) state?: string,
   ) {
     try {
-      const questions = await this.questionsService.getQuestions({
+      const questions = await this.questionsService.findMany({
         formId,
         userId: req.user.id,
         isActive: state === ItemState.active,
@@ -73,17 +73,10 @@ export class QuestionsController {
     @Body() createQuestionDto: CreateQuestionDto,
   ): Promise<Question> {
     try {
-      const question = await this.questionsService.createQuestion({
+      const question = await this.questionsService.create({
         formId,
-        data: {
-          ...createQuestionDto,
-          createdByUser: {
-            connect: {
-              id: req.user.id,
-            },
-          },
-          // TODO : investigate later if there is a better way to do this
-        } as QuestionCreateInput,
+        userId: req.user.id,
+        payload: createQuestionDto,
       });
       return question;
     } catch (error) {
@@ -118,18 +111,11 @@ export class QuestionsController {
     @Body() updateQuestionDto: UpdateQuestionDto,
   ): Promise<Question> {
     try {
-      const question = await this.questionsService.updateQuestion({
+      const question = await this.questionsService.update({
         formId,
         id,
         userId: req.user.id,
-        data: {
-          ...updateQuestionDto,
-          lastUpdatedByUser: {
-            connect: {
-              id: req.user.id,
-            },
-          },
-        },
+        payload: updateQuestionDto,
       });
       return question;
     } catch (error) {
@@ -182,7 +168,7 @@ export class QuestionsController {
     questionType: QuestionType,
   ) {
     try {
-      const question = await this.questionsService.archiveQuestion({
+      const question = await this.questionsService.archive({
         formId,
         id,
         userId: req.user.id,
@@ -239,7 +225,7 @@ export class QuestionsController {
     questionType: QuestionType,
   ) {
     try {
-      const question = await this.questionsService.restoreQuestion({
+      const question = await this.questionsService.restore({
         formId,
         id,
         userId: req.user.id,
@@ -260,61 +246,61 @@ export class QuestionsController {
     }
   }
 
-  @Delete(':id')
-  async deleteQuestion(
-    @Req() req: RequestWithUser,
-    @Param(
-      'formId',
-      new ParseIntPipe({
-        exceptionFactory: () => {
-          throw new BadRequestException('formId must be a number');
-        },
-      }),
-    )
-    formId: number,
-    @Param(
-      'id',
-      new ParseIntPipe({
-        exceptionFactory: () => {
-          throw new BadRequestException('id must be a number');
-        },
-      }),
-    )
-    id: number,
-    @Query(
-      'type',
-      new ParseEnumPipe(QuestionType, {
-        exceptionFactory: () => {
-          throw new BadRequestException(
-            `questionType query param is required and must be one of [${Object.keys(
-              QuestionType,
-            ).join(', ')}] these`,
-          );
-        },
-      }),
-    )
-    questionType: QuestionType,
-  ) {
-    try {
-      await this.questionsService.deleteQuestion({
-        formId,
-        id,
-        userId: req.user.id,
-        questionType,
-      });
-    } catch (error) {
-      if (error instanceof FormNotFoundException) {
-        throw new NotFoundException(error.message);
-      }
-      if (error instanceof QuestionNotFoundException) {
-        throw new NotFoundException(error.message);
-      }
+  // @Delete(':id')
+  // async deleteQuestion(
+  //   @Req() req: RequestWithUser,
+  //   @Param(
+  //     'formId',
+  //     new ParseIntPipe({
+  //       exceptionFactory: () => {
+  //         throw new BadRequestException('formId must be a number');
+  //       },
+  //     }),
+  //   )
+  //   formId: number,
+  //   @Param(
+  //     'id',
+  //     new ParseIntPipe({
+  //       exceptionFactory: () => {
+  //         throw new BadRequestException('id must be a number');
+  //       },
+  //     }),
+  //   )
+  //   id: number,
+  //   @Query(
+  //     'type',
+  //     new ParseEnumPipe(QuestionType, {
+  //       exceptionFactory: () => {
+  //         throw new BadRequestException(
+  //           `questionType query param is required and must be one of [${Object.keys(
+  //             QuestionType,
+  //           ).join(', ')}] these`,
+  //         );
+  //       },
+  //     }),
+  //   )
+  //   questionType: QuestionType,
+  // ) {
+  //   try {
+  //     await this.questionsService.deleteQuestion({
+  //       formId,
+  //       id,
+  //       userId: req.user.id,
+  //       questionType,
+  //     });
+  //   } catch (error) {
+  //     if (error instanceof FormNotFoundException) {
+  //       throw new NotFoundException(error.message);
+  //     }
+  //     if (error instanceof QuestionNotFoundException) {
+  //       throw new NotFoundException(error.message);
+  //     }
 
-      if (error instanceof FormQuestionNotFoundException) {
-        throw new NotFoundException(error.message);
-      }
+  //     if (error instanceof FormQuestionNotFoundException) {
+  //       throw new NotFoundException(error.message);
+  //     }
 
-      throw error;
-    }
-  }
+  //     throw error;
+  //   }
+  // }
 }

@@ -9,7 +9,10 @@ type OptionCreatedEventPayload = {
   formId: number;
   questionId: number;
   questionType: QuestionType;
-  payload: Prisma.OptionCreateInput;
+  payload: Pick<
+    Prisma.OptionCreateInput,
+    'content' | 'position' | 'questionType'
+  >;
   userId: number;
 };
 

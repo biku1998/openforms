@@ -201,35 +201,6 @@ export class FormsService {
     return forms;
   }
 
-  // async getFormById(id: number): Promise<Form> {
-  //   const form = await this.prismaService.form.findUnique({
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  //   if (!form) throw new FormNotFoundException(id);
-
-  //   if (form.isActive === false) throw new ArchivedFormException(id);
-  //   return form;
-  // }
-
-  // async getFormByIdAndCreator(params: {
-  //   id: number;
-  //   creatorId: number;
-  // }): Promise<Form> {
-  //   const { id, creatorId } = params;
-  //   const form = await this.prismaService.form.findFirst({
-  //     where: {
-  //       id,
-  //       createdById: creatorId,
-  //     },
-  //   });
-  //   if (!form) throw new FormNotFoundException(id);
-
-  //   if (form.isActive === false) throw new ArchivedFormException(id);
-  //   return form;
-  // }
-
   async update(params: {
     id: number;
     payload: Pick<Prisma.FormUpdateInput, 'title' | 'description'> & {

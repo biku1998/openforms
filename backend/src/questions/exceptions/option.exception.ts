@@ -17,18 +17,14 @@ export class InvalidQuestionOptionException extends Error {
 }
 
 export class OptionNotFoundException extends Error {
-  constructor({
-    optionId,
-    questionId,
-    questionType,
-  }: {
-    optionId: number;
-    questionId: number;
-    questionType: QuestionType;
-  }) {
-    super(
-      `Option ${optionId} is not present in question ${questionId} of type ${questionType}`,
-    );
+  constructor(id: number) {
+    super(`Option ${id} does not exists`);
+  }
+}
+
+export class ArchivedOptionException extends Error {
+  constructor(id: number) {
+    super(`Option ${id} is archived. Please restore to perform any operation`);
   }
 }
 

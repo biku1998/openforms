@@ -679,4 +679,156 @@ export class QuestionsService {
 
     return question;
   }
+
+  async findMany(params: {
+    formId: number;
+    userId: number;
+    isActive?: boolean;
+  }): Promise<Question[]> {
+    const { userId, formId, isActive = true } = params;
+
+    const form = await this.formsService.findOne({
+      id: formId,
+      userId,
+    });
+
+    if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+    // get links
+    const formQuestions = await this.prismaService.formQuestion.findMany({
+      where: {
+        formId,
+      },
+    });
+
+    if (formQuestions.length === 0) return [];
+
+    const questions: Question[] = [];
+
+    // prepare ids array for each type of question to save db calls
+    const questionTypeIds: { [type in QuestionType]?: number[] } = {};
+
+    formQuestions.forEach((formQuestion) => {
+      if (questionTypeIds[formQuestion.questionType]) {
+        questionTypeIds[formQuestion.questionType].push(
+          formQuestion.questionId,
+        );
+      } else {
+        questionTypeIds[formQuestion.questionType] = [formQuestion.questionId];
+      }
+    });
+
+    for (const questionType of Object.keys(questionTypeIds)) {
+      switch (questionType) {
+        case QuestionType.CHOICE: {
+          const choiceQuestions =
+            await this.prismaService.choiceQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
+              },
+            });
+
+          choiceQuestions.forEach((cq) =>
+            questions.push({ ...cq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.DATE: {
+          const dateQuestions = await this.prismaService.dateQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
+            },
+          });
+
+          dateQuestions.forEach((dq) =>
+            questions.push({ ...dq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.FILE_UPLOAD: {
+          const fileUploadQuestions =
+            await this.prismaService.fileUploadQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
+              },
+            });
+
+          fileUploadQuestions.forEach((fuq) =>
+            questions.push({ ...fuq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.INFO: {
+          const infoQuestions = await this.prismaService.infoQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
+            },
+          });
+
+          infoQuestions.forEach((iq) =>
+            questions.push({ ...iq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.NPS: {
+          const npsQuestions = await this.prismaService.npsQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
+            },
+          });
+
+          npsQuestions.forEach((npq) =>
+            questions.push({ ...npq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.RATING: {
+          const ratingQuestions =
+            await this.prismaService.ratingQuestion.findMany({
+              where: {
+                id: { in: questionTypeIds[questionType] },
+                createdById: userId,
+                isActive,
+              },
+            });
+
+          ratingQuestions.forEach((rq) =>
+            questions.push({ ...rq, type: questionType }),
+          );
+          break;
+        }
+
+        case QuestionType.TEXT: {
+          const textQuestions = await this.prismaService.textQuestion.findMany({
+            where: {
+              id: { in: questionTypeIds[questionType] },
+              createdById: userId,
+              isActive,
+            },
+          });
+
+          textQuestions.forEach((tq) =>
+            questions.push({ ...tq, type: questionType }),
+          );
+          break;
+        }
+      }
+    }
+    return questions;
+  }
 }
