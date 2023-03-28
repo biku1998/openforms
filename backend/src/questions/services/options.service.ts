@@ -5,7 +5,7 @@ import { AppEventType } from 'src/events/types/events';
 import { ArchivedFormException } from 'src/forms/exceptions';
 import { FormsService } from 'src/forms/services';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaErrorCode } from 'src/shared/prisma-error-codes';
+
 import {
   OptionCreatedEvent,
   OptionUpdatedEvent,
@@ -33,6 +33,33 @@ export class OptionsService {
     private readonly formsService: FormsService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  async findMany(params: {
+    questionId: number;
+    questionType: QuestionType;
+    userId: number;
+  }): Promise<Option[]> {
+    const { questionId, questionType, userId } = params;
+
+    const question = await this.questionService.findOne({
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    if (question.isActive === false)
+      throw new ArchivedQuestionException(questionId);
+
+    const options = await this.prismaService.option.findMany({
+      where: {
+        questionId,
+        questionType,
+        createdById: userId,
+      },
+    });
+
+    return options;
+  }
 
   async findOne(params: { id: number; userId: number }) {
     const { id, userId } = params;
@@ -67,12 +94,6 @@ export class OptionsService {
       });
 
       if (form.isActive === false) throw new ArchivedFormException(form.id);
-
-      await this.questionService.findOne({
-        id: questionId,
-        questionType: payload.questionType,
-        userId,
-      });
 
       const question = await this.questionService.findOne({
         id: questionId,
@@ -189,6 +210,66 @@ export class OptionsService {
       new OptionUpdatedEvent({
         id: option.id,
         payload,
+        userId,
+        formId,
+        questionId,
+        questionType,
+      }),
+    );
+
+    return option;
+  }
+
+  async delete(params: {
+    formId: number;
+    questionId: number;
+    questionType: QuestionType;
+    id: number;
+    userId: number;
+  }) {
+    const { id, formId, questionId, questionType, userId } = params;
+
+    const form = await this.formsService.findOne({
+      id: formId,
+      userId,
+    });
+
+    if (form.isActive === false) throw new ArchivedFormException(form.id);
+
+    const question = await this.questionService.findOne({
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    if (question.isActive === false)
+      throw new ArchivedQuestionException(questionId);
+
+    if (
+      (await this.questionService.doesQuestionExistInForm({
+        formId,
+        questionId,
+        questionType,
+      })) === false
+    )
+      throw new QuestionNotFoundException(questionId);
+
+    await this.findOne({
+      id,
+      userId,
+    });
+
+    const option = await this.prismaService.option.delete({
+      where: {
+        id,
+      },
+    });
+
+    // fire events
+    this.eventEmitter.emit(
+      AppEventType.OPTION_DELETED,
+      new OptionDeletedEvent({
+        id: option.id,
         userId,
         formId,
         questionId,

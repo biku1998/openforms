@@ -470,55 +470,247 @@ describe('OptionService', () => {
     ).rejects.toThrow(ArchivedQuestionException);
   });
 
-  it.todo(
-    'should throw exception if we try to archive a option for a question in a form that does not exist',
-  );
+  it('should throw exception if we try to archive a option for a question in a form that does not exist', async () => {
+    await expect(
+      service.archive({
+        id: 101,
+        formId: 1011,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(FormNotFoundException);
+  });
 
-  it.todo(
-    'should throw exception if we try to archive a option for a question for an archived form',
-  );
+  it('should throw exception if we try to archive a option for a question for an archived form', async () => {
+    await formsService.archive({
+      id: formId,
+      userId,
+    });
 
-  it.todo('should restore a option');
+    await expect(
+      service.archive({
+        id: 101,
+        formId,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(ArchivedFormException);
+  });
 
-  it.todo(
-    'should throw exception if we try to restore a option that does not exist',
-  );
+  // TODO : remove archive and restore test cases
+  // as we will be dropping option archive & restore feature
+  // it('should restore a option', async () => {
+  //   const payload = {
+  //     content: 'option 1',
+  //     position: 0,
+  //     questionType,
+  //   };
 
-  it.todo(
-    'should throw exception if we try to restore a option for a question that does not exist',
-  );
+  //   const option = await service.create({
+  //     formId,
+  //     userId,
+  //     questionId,
+  //     payload,
+  //   });
 
-  it.todo(
-    'should throw exception if we try to restore a option for an archived question',
-  );
+  //   await service.archive({
+  //     formId,
+  //     id: option.id,
+  //     userId,
+  //     questionId,
+  //     questionType,
+  //   });
 
-  it.todo(
-    'should throw exception if we try to restore a option for a question in a form that does not exist',
-  );
+  //   const restoredOption = await service.restore({
+  //     formId,
+  //     id: option.id,
+  //     userId,
+  //     questionId,
+  //     questionType,
+  //   });
+  // });
 
-  it.todo(
-    'should throw exception if we try to restore a option for a question for an archived form',
-  );
+  // it.todo(
+  //   'should throw exception if we try to restore a option that does not exist',
+  // );
 
-  it.todo('should delete a option');
+  // it.todo(
+  //   'should throw exception if we try to restore a option for a question that does not exist',
+  // );
 
-  it.todo(
-    'should throw exception if we try to delete a option that does not exist',
-  );
+  // it.todo(
+  //   'should throw exception if we try to restore a option for an archived question',
+  // );
 
-  it.todo(
-    'should throw exception if we try to delete a option for a question that does not exist',
-  );
+  // it.todo(
+  //   'should throw exception if we try to restore a option for a question in a form that does not exist',
+  // );
 
-  it.todo(
-    'should throw exception if we try to delete a option for an archived question',
-  );
+  // it.todo(
+  //   'should throw exception if we try to restore a option for a question for an archived form',
+  // );
 
-  it.todo(
-    'should throw exception if we try to delete a option for a question in a form that does not exist',
-  );
+  it('should delete a option', async () => {
+    const payload = {
+      content: 'option 1',
+      position: 0,
+      questionType,
+    };
 
-  it.todo(
-    'should throw exception if we try to delete a option for a question for an archived form',
-  );
+    const option = await service.create({
+      formId,
+      userId,
+      questionId,
+      payload,
+    });
+
+    const deletedOption = await service.delete({
+      formId,
+      userId,
+      questionId,
+      questionType,
+      id: option.id,
+    });
+
+    expect(deletedOption).toHaveProperty('id', option.id);
+
+    expect(eventEmitter.emit).toHaveBeenCalledWith(
+      AppEventType.OPTION_DELETED,
+      {
+        eventType: AppEventType.OPTION_DELETED,
+        payload: {
+          id: option.id,
+          userId,
+          formId,
+          questionId,
+          questionType,
+        },
+        userId,
+      },
+    );
+
+    await expect(
+      service.findOne({
+        id: option.id,
+        userId,
+      }),
+    ).rejects.toThrow(OptionNotFoundException);
+  });
+
+  it('should throw exception if we try to delete a option that does not exist', async () => {
+    await expect(
+      service.delete({
+        id: 101,
+        formId,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(OptionNotFoundException);
+  });
+
+  it('should throw exception if we try to delete a option for a question that does not exist', async () => {
+    await expect(
+      service.archive({
+        id: 101,
+        formId,
+        userId,
+        questionId: 101,
+        questionType,
+      }),
+    ).rejects.toThrow(QuestionNotFoundException);
+  });
+
+  it('should throw exception if we try to delete a option for an archived question', async () => {
+    await questionsService.archive({
+      formId,
+      id: questionId,
+      questionType,
+      userId,
+    });
+
+    await expect(
+      service.archive({
+        id: 101,
+        formId,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(ArchivedQuestionException);
+  });
+
+  it('should throw exception if we try to delete a option for a question in a form that does not exist', async () => {
+    await expect(
+      service.archive({
+        id: 101,
+        formId: 1011,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(FormNotFoundException);
+  });
+
+  it('should throw exception if we try to delete a option for a question for an archived form', async () => {
+    await formsService.archive({
+      id: formId,
+      userId,
+    });
+
+    await expect(
+      service.archive({
+        id: 101,
+        formId,
+        userId,
+        questionId,
+        questionType,
+      }),
+    ).rejects.toThrow(ArchivedFormException);
+  });
+
+  it('should get all the options for a question', async () => {
+    await service.create({
+      formId,
+      userId,
+      questionId,
+      payload: {
+        content: 'option 1',
+        position: 0,
+        questionType,
+      },
+    });
+
+    await service.create({
+      formId,
+      userId,
+      questionId,
+      payload: {
+        content: 'option 2',
+        position: 1,
+        questionType,
+      },
+    });
+
+    await service.create({
+      formId,
+      userId,
+      questionId,
+      payload: {
+        content: 'option 3',
+        position: 2,
+        questionType,
+      },
+    });
+
+    const options = await service.findMany({
+      questionId,
+      questionType,
+      userId,
+    });
+
+    expect(options).toHaveLength(3);
+  });
 });
