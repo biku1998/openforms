@@ -5,7 +5,14 @@ import { AppEventType } from 'src/events/types/events';
 
 type FormQuizSettingCreatedEventPayload = {
   formId: number;
-  payload: Prisma.FormQuizSettingCreateInput;
+  payload: Pick<
+    Prisma.FormQuizSettingCreateInput,
+    | 'defaultPointValue'
+    | 'releaseScoreImmediately'
+    | 'viewMissedQuestions'
+    | 'viewCorrectAnswers'
+    | 'viewPointValues'
+  >;
   userId: number;
 };
 

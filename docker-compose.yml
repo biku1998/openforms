@@ -14,17 +14,17 @@ services:
     ports:
       - ${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}
 
-  # frontend:
-  #   container_name: openforms-frontend
-  #   image: biku1998/openforms-frontend
-  #   restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./frontend
-  #   environment:
-  #     - PORT=${FRONTEND_PORT}
-  #     - NEXT_PUBLIC_BACKEND_API_BASE_URL=${NEXT_PUBLIC_BACKEND_API_BASE_URL}
-  #   ports:
-  #     - ${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}
-  #   depends_on:
-  #     - backend
+  frontend:
+    container_name: openforms-frontend
+    image: biku1998/openforms-frontend
+    restart: '${DOCKER_RESTART_POLICY:-unless-stopped}'
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    environment:
+      - PORT=${FRONTEND_PORT}
+      - NEXT_PUBLIC_BACKEND_API_BASE_URL=${NEXT_PUBLIC_BACKEND_API_BASE_URL}
+    ports:
+      - ${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}
+    # depends_on:
+    #   - backend
