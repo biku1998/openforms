@@ -1,14 +1,34 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { Button } from "./button";
+import { Meta, StoryObj } from "@storybook/react";
+import { Button, buttonVariants } from "./button";
 
-export default {
+const meta: Meta<typeof Button> = {
   title: "Components/UI/Button",
   component: Button,
-} as ComponentMeta<typeof Button>;
+  tags: ["autodocs"],
+  argTypes: {
+    variant: {
+      type: "string",
+      description: "destructive",
+    },
+    disabled: {
+      type: "boolean",
+    },
+  },
+};
 
-const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />;
+export default meta;
 
-export const Primary = Template.bind({});
-Primary.args = {
-  children: "hello world",
+type Story = StoryObj<typeof Button>;
+
+export const Default: Story = {
+  args: {
+    children: "Hello world",
+  },
+};
+
+export const Destructive: Story = {
+  args: {
+    ...Default.args,
+    variant: "destructive",
+  },
 };
