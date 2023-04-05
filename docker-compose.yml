@@ -26,5 +26,3 @@ services:
       - NEXT_PUBLIC_BACKEND_API_BASE_URL=${NEXT_PUBLIC_BACKEND_API_BASE_URL}
     ports:
       - ${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}
-    # depends_on:
-    #   - backend
